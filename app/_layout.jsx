@@ -6,9 +6,10 @@
 //   return <Slot />;
 // }
 
-import { Stack, useRouter, useSegments } from 'expo-router';
+import { Slot, Stack, useRouter, useSegments } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
+import { RootineProvider } from "../provider/RootineProvider.jsx";
 
 export default function RootLayout() {
   const [session, setSession] = useState(null);
@@ -46,11 +47,15 @@ export default function RootLayout() {
   }, [session, segments, loading]);
 
   return (
-    <Stack
-      screenOptions={{
-        headerShown: false,
-        animation: 'slide_from_right',
-      }}
-    />
+    <RootineProvider>
+      <Stack
+        screenOptions={{
+          headerShown: false,
+          animation: 'slide_from_right',
+        }}
+      >
+        <Slot />
+      </Stack>
+    </RootineProvider>
   );
 }

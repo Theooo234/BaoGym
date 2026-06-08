@@ -8,26 +8,32 @@ const RootineContext = createContext({
   addRootine: () => { },
   setRootine: () => { },
   rootines: [],
+  exercices: [],
+  addExerciceToRootine: () => { },
 });
+
+
 
 export function RootineProvider({ children }) {
 
   const router = useRouter();
   const [rootines, setRootines] = useState([]);
+  const [loading, setLoading] = useState(false);
   const [rootine, setRootine] = useState({
     nom: "", duree: "", jour: ""
   });
-  const [exercice, setExercice] = useState([
-    { name: '', image: '' },
-  ]);
+  const [exercices, setExercices] = useState([]);
 
-    const addExercice = () => {
-    setExercice([exercice]);
+
+  const addExerciceToRootine = (exerciceDeBase) => {
+    console.log("====>", exerciceDeBase)
+    //setExercices([...exercices, { nom: exerciceDeBase.nom, image: exerciceDeBase.image, description: exerciceDeBase.description }]);
   };
+
+
 
   const addRootine = async () => {
     try {
-
         // Get current user
         const { data: { user } } = await supabase.auth.getUser();
         
@@ -53,8 +59,11 @@ export function RootineProvider({ children }) {
             console.log('Erreur lors de l\'insertion de la routine', routinesError.message);
           }
 
-        console.log('Succès', 'Recette créée avec succès');
-        router.back();
+          // Insert exercices
+          addExercices(insertedRootine.id);
+
+      Alert.alert('Succès', 'Rootine créée avec succès');
+      router.back();
       } catch (error) {
         console.log('Erreur', error.message);
       } finally {
@@ -83,98 +92,34 @@ export function RootineProvider({ children }) {
     } }
 
 
+const addExercices = async (rootineId) => {
+    try {
+      // Get current user
+      const { data: { user } } = await supabase.auth.getUser();
 
+      // Insert exercises
 
+      const exercicesToInsert = exercices.map(ex => ({
+        nom: ex.nom.trim(),
+        image: ex.image.trim() || null,
+        description: ex.description.trim() || null,
+        rootine_id: rootineId,
+        user_id: user.id,
+      }));
 
+      const { data: insertedExercices, error: exercicesError } = await supabase
+        .from('exercices')
+        .insert(exercicesToInsert)
+        .select()
+        .single();
 
+      if (exercicesError) throw exercicesError;
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// try {
-//       // Get current user
-//       const { data: { user } } = await supabase.auth.getUser();
-
-//       // Insert recipe
-//       const { data: recipe, error: recipeError } = await supabase
-//         .from('recipes')
-//         .insert([
-//           {
-//             title: title.trim(),
-//             description: description.trim() || null,
-//             user_id: user.id,
-//           },
-//         ])
-//         .select()
-//         .single();
-
-//       if (recipeError) throw recipeError;
-
-//       // Insert ingredients
-//       const ingredientsToInsert = validIngredients.map(ing => ({
-//         recipe_id: recipe.id,
-//         name: ing.name.trim(),
-//         quantity: ing.quantity.trim() || null,
-//         unit: ing.unit.trim() || null,
-//       }));
-
-//       const { error: ingredientsError } = await supabase
-//         .from('ingredients')
-//         .insert(ingredientsToInsert);
-
-//       if (ingredientsError) throw ingredientsError;
-
-//       Alert.alert('Succès', 'Recette créée avec succès');
-//       router.back();
-//     } catch (error) {
-//       Alert.alert('Erreur', error.message);
-//     } finally {
-//       setLoading(false);
-//     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    } catch (error) {
+      Alert.alert('Erreur', error.message);
+    } finally {
+      setLoading(false);
+    }}
 
 
     return (
@@ -184,6 +129,8 @@ export function RootineProvider({ children }) {
           addRootine,
           setRootine,
           rootines,
+          exercices,
+          addExerciceToRootine,
         }}
       >
         {children}

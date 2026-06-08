@@ -18,9 +18,11 @@ import { useRootine } from "../hooks/useRootine.jsx";
 
 export default function CreerRootine() {
   const router = useRouter();
-  const { addRootine, rootine, setRootine } = useRootine();
+  const { addRootine, rootine, setRootine, exercices } = useRootine();
   const [loading, setLoading] = useState(false);
   const [isModalVisible, setModalVisible] = useState(false);
+
+  console.log("rootine", rootine);
 
   const toggleModal = () => {
     setModalVisible(!isModalVisible);
@@ -194,9 +196,10 @@ export default function CreerRootine() {
 
         <View>
           <Text style={[styles.titleSection, { marginTop: 15 }]}>
-            Exercices
+            Exercices ({exercices.length})
           </Text>
           <View style={[styles.card, { marginTop: 0 }]}>
+            {/* {exercices == null || exercices.length === 0 ? ()} */}
             <TouchableOpacity
               style={styles.creer}
               onPress={() => router.push("/rootine/add")}

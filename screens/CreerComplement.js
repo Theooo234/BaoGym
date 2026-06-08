@@ -1,6 +1,6 @@
 import Entypo from "@expo/vector-icons/Entypo";
 import { useRouter } from "expo-router";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 import Screen from "../components/Screen.js";
 import colors from "../config/color.js";
 
@@ -16,6 +16,20 @@ export default function CreerComplement() {
           <View style={styles.titleContainer}>
             <Text style={styles.title}>Nouveau Complément</Text>
           </View>
+        </View>
+        <View style={styles.formContainer}>
+          <TextInput
+            style={styles.input}
+            placeholder="Nom du complément (ex: Magnésium)"
+            placeholderTextColor="#999"
+            editable={false}
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="Dosage (ex: 400mg)"
+            placeholderTextColor="#999"
+            editable={false}
+          />
         </View>
         <View style={[styles.ajoutContainer]}>
           <Pressable style={styles.creerContent} onPress="">
@@ -34,16 +48,14 @@ const styles = StyleSheet.create({
     // backgroundColor: "#f9fcf8",
     alignItems: "left",
     justifyContent: "flex-start",
-    marginVertical: 20,
+    marginVertical: 0,
     marginHorizontal: 20,
   },
   topContainer: {
-    width: "100%",
-    height: 120,
     backgroundColor: "#f9fcf8",
-    borderRadius: 20,
     position: "relative",
     flexDirection: "row",
+    gap: 15,
   },
   icon: {
     width: 50,
@@ -53,12 +65,29 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     zIndex: 1,
+    formContainer: {
+      backgroundColor: colors.white,
+      marginTop: 30,
+      paddingHorizontal: 20,
+      paddingVertical: 20,
+      borderRadius: 12,
+      gap: 16,
+    },
+    input: {
+      backgroundColor: "#f5f5f5",
+      borderWidth: 1,
+      borderColor: colors.baogreen,
+      borderRadius: 10,
+      paddingHorizontal: 16,
+      paddingVertical: 14,
+      fontSize: 16,
+      color: "#333",
+      fontFamily: "Montserrat",
+    },
     borderWidth: 1,
     borderColor: "#E2E8F0",
   },
   titleContainer: {
-    position: "absolute",
-
     flexDirection: "column",
     alignItems: "flex-start",
   },

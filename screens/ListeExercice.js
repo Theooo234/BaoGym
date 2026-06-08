@@ -13,6 +13,7 @@ import {
 } from "react-native";
 import ListItemSeparator from "../components/ListItemSeparator.js";
 import colors from "../config/color.js";
+import { useRootine } from "../hooks/useRootine.jsx";
 import { supabase } from "../lib/supabase";
 
 export default function ListeExercices({ id } = {}) {
@@ -22,8 +23,13 @@ export default function ListeExercices({ id } = {}) {
   const [exercices, setExercices] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const {
+    addExerciceToRootine,
+    exercices: rootineExercices,
+    rootine,
+  } = useRootine();
 
-  console.log("====== Exercices:", exercices);
+  console.log("====== Exercices:", addExerciceToRootine, rootine);
 
   useEffect(() => {
     fetchExercices();
@@ -59,6 +65,14 @@ export default function ListeExercices({ id } = {}) {
     );
   }
 
+  const handleAddExercice = () => {
+    if (pressedExercice !== null) {
+      console.log("pressedExercice", pressedExercice);
+
+      addExerciceToRootine(pressedExercice);
+    }
+  };
+
   return (
     <View style={styles.container}>
       <View>
@@ -68,7 +82,13 @@ export default function ListeExercices({ id } = {}) {
         <Entypo name="chevron-left" size={24} color="black" />
       </Pressable>
       <View style={[styles.ajoutContainer]}>
-        <Pressable style={styles.creerContent} onPress={() => router.back()}>
+        <Pressable
+          style={styles.creerContent}
+          onPress={() => {
+            handleAddExercice();
+            router.back();
+          }}
+        >
           <Text style={styles.ajoutText}>Ajouter à la routine </Text>
         </Pressable>
       </View>
@@ -85,15 +105,15 @@ export default function ListeExercices({ id } = {}) {
         renderItem={({ item }) => (
           <Pressable
             key={item.id}
-            onPress={() => setPressedExercice(item.id)}
+            onPress={() => setPressedExercice(item)}
             style={
-              pressedExercice !== item.id
-                ? styles.exerciceCard
-                : {
+              pressedExercice && pressedExercice.id === item.id
+                ? {
                     ...styles.exerciceCard,
                     borderColor: "#BEF264",
                     borderWidth: 2,
                   }
+                : styles.exerciceCard
             }
           >
             <Image
