@@ -11,6 +11,7 @@ import ListExercices from "../components/ListeRootines.js";
 import ListItemSeparator from "../components/ListItemSeparator.js";
 import Screen from "../components/Screen.js";
 import colors from "../config/color.js";
+import { useRootine } from "../hooks/useRootine.jsx";
 
 export const Rootines = [
   {
@@ -186,7 +187,9 @@ export const Rootines = [
 ];
 
 export default function Rootine() {
+  const { rootines } = useRootine();
   const router = useRouter();
+  console.log("Rootines dans Rootine.js", rootines);
 
   //   const { evenements } = useEvent();
 
@@ -203,7 +206,7 @@ export default function Rootine() {
               padding: 20,
               backgroundColor: "#f9fcf8",
             }}
-            data={Rootines}
+            data={rootines}
             showsVerticalScrollIndicator={false}
             contentContainerStyle={{ paddingBottom: 230 }}
             keyExtractor={(item) => item.id}

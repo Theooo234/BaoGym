@@ -28,9 +28,8 @@ export default function ListRootines({ item }) {
             <Text style={styles.title}>{item.nom}</Text>
             <Text style={styles.edit}>...</Text>
             <Text style={styles.subTitle}>
-              {item.duréeEstimée} - {item.jourPrévu}
+              {item.duree_estimee} - {item.jour_prevu}
             </Text>
-            <Text style={styles.description}>{item.description}</Text>
           </View>
         </TouchableOpacity>
         <TouchableOpacity

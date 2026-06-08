@@ -39,7 +39,7 @@ export default function ListeExercice({ item }) {
           onPress={() => router.push(`/rootine/${item.id}/start`)}
         >
           <View style={styles.buttonContent}>
-            <Text style={styles.textButton}>Commencer la Rootine</Text>
+            <Text style={styles.textButton}>Commencer la eeRootine</Text>
             <SvgXml
               xml={MyIcon}
               width={20}
