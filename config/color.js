@@ -7,4 +7,5 @@ export default {
   light: "#f8f4f4",
   slate: "#0F172A",
   baogreen: "#65A30D",
+  baogreenSombre: "#457008",
 };

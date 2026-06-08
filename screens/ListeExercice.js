@@ -32,14 +32,14 @@ export default function ListeExercices({ id } = {}) {
   const fetchExercices = async () => {
     try {
       const { data, error } = await supabase
-        .from("exercices")
+        .from("exercices_de_base")
         .select("*")
         .order("created_at", { ascending: false });
 
       if (error) throw error;
       setExercices(data || []);
     } catch (error) {
-      Alert.alert("Erreur", "Impossible de charger les recettes");
+      Alert.alert("Erreur", "Impossible de charger les exercices.");
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -68,9 +68,9 @@ export default function ListeExercices({ id } = {}) {
         <Entypo name="chevron-left" size={24} color="black" />
       </Pressable>
       <View style={[styles.ajoutContainer]}>
-        <View style={styles.creerContent}>
+        <Pressable style={styles.creerContent} onPress={() => router.back()}>
           <Text style={styles.ajoutText}>Ajouter à la routine </Text>
-        </View>
+        </Pressable>
       </View>
       <FlatList
         style={{

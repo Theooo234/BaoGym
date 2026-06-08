@@ -6,7 +6,7 @@
 //   return <Slot />;
 // }
 
-import { Slot, useRouter, useSegments } from 'expo-router';
+import { Stack, useRouter, useSegments } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
 
@@ -45,5 +45,12 @@ export default function RootLayout() {
     }
   }, [session, segments, loading]);
 
-  return <Slot />;
+  return (
+    <Stack
+      screenOptions={{
+        headerShown: false,
+        animation: 'slide_from_right',
+      }}
+    />
+  );
 }

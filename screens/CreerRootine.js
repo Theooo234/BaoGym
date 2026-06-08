@@ -1,48 +1,144 @@
 import Entypo from "@expo/vector-icons/Entypo";
 import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 import { useRouter } from "expo-router";
+import { useState } from "react";
 import {
     Pressable,
+    ScrollView,
     StyleSheet,
     Text,
     TextInput,
     TouchableOpacity,
     View,
 } from "react-native";
-
-import { useState } from "react";
+import Modal from "react-native-modal";
+import Separation from "../components/Separation.js";
 import colors from "../config/color.js";
 import { useRootine } from "../hooks/useRootine.jsx";
 
 export default function CreerRootine() {
   const router = useRouter();
+  const { addRootine, rootine, setRootine } = useRootine();
+  const [loading, setLoading] = useState(false);
+  const [isModalVisible, setModalVisible] = useState(false);
 
-  const [nom, setNom] = useState("");
-  const [duree, setDuree] = useState("");
-  const [jour, setJour] = useState("");
-
-  const { addRootine, rootine, setRootine, updateRootine } = useRootine();
+  const toggleModal = () => {
+    setModalVisible(!isModalVisible);
+  };
 
   const handlesubmit = async (e) => {
     e.preventDefault();
-    const NouvelleRootine = {
-      nom: nom,
-      dureeEstimée: duree,
-      jourPrévu: jour,
-      exercices: [],
-    };
-    await addRootine(NouvelleRootine);
-    setDuree("");
-    setNom("");
-    setJour("");
-    router.push("/home/rootines");
-  };
+    //faire la validation des champs
+    if (!rootine.nom || !rootine.duree || !rootine.jour) {
+      alert("Veuillez remplir tous les champs");
+      return;
+    }
 
+    console.log("Création de la rootine:", rootine);
+    await addRootine();
+
+    console.log("Rootine créée ?");
+
+    router.dismiss();
+  };
   //   const { evenements } = useEvent();
-  console.log("===== WelcomeScreen ====", rootine);
+  console.log("===== CreerRootine ====", rootine);
 
   return (
     <>
+      <Modal isVisible={isModalVisible} style={{ margin: 0 }}>
+        <Pressable style={styles.modalOverlay} onPress={toggleModal}>
+          <View
+            style={{
+              backgroundColor: "white",
+              borderRadius: 20,
+              justifyContent: "center",
+              alignItems: "center",
+              maxHeight: "40%",
+            }}
+          >
+            <ScrollView
+              showsVerticalScrollIndicator={false}
+              style={styles.ScrollView}
+            >
+              <Pressable
+                style={styles.modalOption}
+                onPress={() => {
+                  setRootine({ ...rootine, jour: "Lundi" });
+                  toggleModal();
+                }}
+              >
+                <Text style={styles.modalText}>Lundi</Text>
+                <Separation />
+              </Pressable>
+              <Pressable
+                style={styles.modalOption}
+                onPress={() => {
+                  setRootine({ ...rootine, jour: "Mardi" });
+                  toggleModal();
+                }}
+              >
+                <Text style={styles.modalText}>Mardi</Text>
+                <Separation />
+              </Pressable>
+              <Pressable
+                style={styles.modalOption}
+                onPress={() => {
+                  setRootine({ ...rootine, jour: "Mercredi" });
+                  toggleModal();
+                }}
+              >
+                <Text style={styles.modalText}>Mercredi</Text>
+                <Separation />
+              </Pressable>
+              <Pressable
+                style={styles.modalOption}
+                onPress={() => {
+                  setRootine({ ...rootine, jour: "Jeudi" });
+                  toggleModal();
+                }}
+              >
+                <Text style={styles.modalText}>Jeudi</Text>
+                <Separation />
+              </Pressable>
+              <Pressable
+                style={styles.modalOption}
+                onPress={() => {
+                  setRootine({ ...rootine, jour: "Vendredi" });
+                  toggleModal();
+                }}
+              >
+                <Text style={styles.modalText}>Vendredi</Text>
+                <Separation />
+              </Pressable>
+              <Pressable
+                style={styles.modalOption}
+                onPress={() => {
+                  setRootine({ ...rootine, jour: "Samedi" });
+                  toggleModal();
+                }}
+              >
+                <Text style={styles.modalText}>Samedi</Text>
+                <Separation />
+              </Pressable>
+              <Pressable
+                style={styles.modalOption}
+                onPress={() => {
+                  setRootine({ ...rootine, jour: "Dimanche" });
+                  toggleModal();
+                }}
+              >
+                <Text style={styles.modalText}>Dimanche</Text>
+                <Separation />
+              </Pressable>
+            </ScrollView>
+
+            <Pressable style={styles.modalCloseButton} onPress={toggleModal}>
+              <Text style={styles.modalCloseText}> Selectionner </Text>
+            </Pressable>
+          </View>
+        </Pressable>
+      </Modal>
       <View style={styles.container}>
         <Pressable style={styles.icon} onPress={() => router.back()}>
           <Entypo name="chevron-left" size={24} color="black" />
@@ -53,7 +149,7 @@ export default function CreerRootine() {
 
         <View style={[styles.ajoutContainer]}>
           <Pressable style={styles.creerContent} onPress={handlesubmit}>
-            <Text style={styles.ajoutText}>Créer ma Rootine</Text>
+            <Text style={styles.ajoutText}>Créer la Rootine</Text>
           </Pressable>
         </View>
         <View style={styles.card}>
@@ -63,10 +159,8 @@ export default function CreerRootine() {
             placeholder="Ex: Séance Jambes"
             placeholderTextColor="#94A3B8"
             value={rootine.nom}
-            onChange={(e) => {
-              rootine.name = e.nativeEvent.text;
-              console.log("XXXX", rootine);
-              updateRootine({ ...rootine });
+            onChangeText={(text) => {
+              setRootine({ ...rootine, nom: text });
             }}
           />
 
@@ -75,20 +169,29 @@ export default function CreerRootine() {
             style={styles.input}
             placeholder="Ex: 1h 00min"
             placeholderTextColor="#94A3B8"
-            onChange={(e) => {
-              rootine.duree = e.nativeEvent.text;
-              setRootine(rootine);
+            value={rootine.duree}
+            onChangeText={(text) => {
+              setRootine({ ...rootine, duree: text });
             }}
           />
 
           <Text style={[styles.label, { marginTop: 15 }]}>JOUR </Text>
-          <TextInput
+          <Pressable
             style={styles.input}
-            placeholder="Ex: Mercredi"
-            placeholderTextColor="#94A3B8"
-            onChange={(e) => setJour(e.nativeEvent.text)}
-          />
+            placeholder="Ex: Lundi"
+            onPress={toggleModal}
+          >
+            <Text
+              style={[
+                styles.inputText,
+                { color: rootine.jour ? "#0F172A" : "#94A3B8" },
+              ]}
+            >
+              {rootine.jour || "Sélectionner un jour"}
+            </Text>
+          </Pressable>
         </View>
+
         <View>
           <Text style={[styles.titleSection, { marginTop: 15 }]}>
             Exercices
@@ -98,10 +201,10 @@ export default function CreerRootine() {
               style={styles.creer}
               onPress={() => router.push("/rootine/add")}
             >
-              <Pressable style={styles.creerContent} type="submit">
+              <View style={styles.creerContent} type="submit">
                 <FontAwesome5 name="plus" size={16} color={colors.baogreen} />
                 <Text style={styles.creerText}>Ajouter un Exercice</Text>
-              </Pressable>
+              </View>
             </TouchableOpacity>
           </View>
         </View>
@@ -233,5 +336,55 @@ const styles = StyleSheet.create({
     color: "#65A30D",
     fontSize: 18,
     fontWeight: "bold",
+  },
+  modalText: {
+    fontSize: 16,
+    fontWeight: "500",
+    color: "#0F172A",
+    fontFamily: "Inter",
+    marginVertical: 10,
+  },
+  button: {
+    backgroundColor: colors.baogreen,
+    padding: 12,
+    borderRadius: 15,
+    borderStyle: "solid",
+    borderColor: colors.baogreen,
+    borderWidth: 1,
+    alignItems: "center",
+    marginTop: 20,
+  },
+  inputText: {
+    fontSize: 16,
+    fontWeight: "bold",
+  },
+  modalCloseText: {
+    color: colors.white,
+    fontSize: 16,
+    fontWeight: "500",
+    marginTop: 10,
+    backgroundColor: colors.baogreen,
+    paddingVertical: 15,
+    paddingHorizontal: 50,
+    borderRadius: 10,
+  },
+  modalCloseButton: {
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 20,
+  },
+  modalOverlay: {
+    backgroundColor: "transparent",
+    flex: 1,
+    justifyContent: "flex-end",
+    width: "100%",
+  },
+  modalOption: {
+    padding: 15,
+    width: "100%",
+    alignItems: "center",
+  },
+  ScrollView: {
+    width: "100%",
   },
 });
