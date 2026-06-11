@@ -1,11 +1,12 @@
 import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 import { useRouter } from "expo-router";
+import { useEffect, useState } from "react";
 import {
-  FlatList,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
+    FlatList,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View,
 } from "react-native";
 import ListComplements from "../components/ListeComplements.js";
 import ListItemSeparator from "../components/ListItemSeparator.js";
@@ -47,6 +48,38 @@ export const ComplementsData = [
 
 export default function Complements() {
   const router = useRouter();
+  const TOTAL_TIME = 20 * 60;
+  const [secondsLeft, setSecondsLeft] = useState(TOTAL_TIME);
+  const [isActive, setIsActive] = useState(false);
+
+  useEffect(() => {
+    let interval = null;
+
+    if (isActive && secondsLeft > 0) {
+      interval = setInterval(() => {
+        setSecondsLeft((prev) => prev - 1);
+      }, 1000);
+    } else if (secondsLeft === 0) {
+      clearInterval(interval);
+      setIsActive(false);
+      alert("Tu peux aller chercher ta yanga bb");
+    }
+
+    return () => clearInterval(interval);
+  }, [isActive, secondsLeft]);
+
+  const formatTime = (timeInSeconds) => {
+    const minutes = Math.floor(timeInSeconds / 60);
+    const seconds = timeInSeconds % 60;
+    return `${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
+  };
+
+  const toggleTimer = () => setIsActive(!isActive);
+  const resetTimer = () => {
+    setIsActive(false);
+    setSecondsLeft(TOTAL_TIME);
+  };
+
   return (
     <Screen>
       <View style={styles.background}>
@@ -78,6 +111,15 @@ export default function Complements() {
               </TouchableOpacity>
             )}
           />
+          {/* <View style={styles.yangaButton}>
+            <TouchableOpacity onPress={toggleTimer}>
+              <Text>{isActive ? "Pause" : "Démarrer le timer"}</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={resetTimer}>
+              <Text>Réinitialiser</Text>
+            </TouchableOpacity>
+            <Text>Temps restant : {formatTime(secondsLeft)}</Text>
+          </View> */}
         </View>
       </View>
     </Screen>
@@ -119,5 +161,15 @@ const styles = StyleSheet.create({
     color: "#65A30D",
     fontSize: 18,
     fontWeight: "bold",
+  },
+  yangaButton: {
+    position: "absolute",
+    bottom: 200,
+    left: 20,
+    right: 20,
+    backgroundColor: colors.baogreen,
+    paddingVertical: 15,
+    borderRadius: 30,
+    alignItems: "center",
   },
 });

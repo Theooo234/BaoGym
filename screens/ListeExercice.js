@@ -1,8 +1,7 @@
 import Entypo from "@expo/vector-icons/Entypo";
 import { useRouter } from "expo-router";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
-  Alert,
   FlatList,
   Image,
   Pressable,
@@ -12,63 +11,40 @@ import {
   View,
 } from "react-native";
 import ListItemSeparator from "../components/ListItemSeparator.js";
+import LoadingIndicator from "../components/LoadingIndicator.js";
 import colors from "../config/color.js";
 import { useRootine } from "../hooks/useRootine.jsx";
-import { supabase } from "../lib/supabase";
 
 export default function ListeExercices({ id } = {}) {
   const router = useRouter();
   const [pressedExercice, setPressedExercice] = useState(null);
 
-  const [exercices, setExercices] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const {
     addExerciceToRootine,
     exercices: rootineExercices,
     rootine,
+    fetchExercicesDeBase,
+    exercicesDeBase,
+    loading,
   } = useRootine();
-
-  console.log("====== Exercices:", addExerciceToRootine, rootine);
-
-  useEffect(() => {
-    fetchExercices();
-  }, []);
-
-  const fetchExercices = async () => {
-    try {
-      const { data, error } = await supabase
-        .from("exercices_de_base")
-        .select("*")
-        .order("created_at", { ascending: false });
-
-      if (error) throw error;
-      setExercices(data || []);
-    } catch (error) {
-      Alert.alert("Erreur", "Impossible de charger les exercices.");
-    } finally {
-      setLoading(false);
-      setRefreshing(false);
-    }
-  };
 
   const handleRefresh = () => {
     setRefreshing(true);
-    fetchExercices();
+    fetchExercicesDeBase();
   };
 
   if (loading) {
     return (
       <View style={styles.centered}>
-        <Text>Chargement...</Text>
+        <Text style={styles.loadingText}>Chargement...</Text>
+        <LoadingIndicator />
       </View>
     );
   }
 
   const handleAddExercice = () => {
     if (pressedExercice !== null) {
-      console.log("pressedExercice", pressedExercice);
-
       addExerciceToRootine(pressedExercice);
     }
   };
@@ -98,7 +74,7 @@ export default function ListeExercices({ id } = {}) {
           padding: 20,
           backgroundColor: "#f9fcf8",
         }}
-        data={exercices}
+        data={exercicesDeBase}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 230 }}
         keyExtractor={(item, index) => `${item.id}-${index}`}
@@ -214,5 +190,18 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "700",
     fontFamily: "Monserrat",
+  },
+  centered: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    flexDirection: "row",
+    gap: 10,
+  },
+  loadingText: {
+    fontSize: 22,
+    color: "#64748B",
+    fontFamily: "Inter",
+    fontWeight: "500",
   },
 });

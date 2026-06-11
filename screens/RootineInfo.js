@@ -2,23 +2,69 @@ import Entypo from "@expo/vector-icons/Entypo";
 import EvilIcons from "@expo/vector-icons/EvilIcons";
 import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 import { useRouter } from "expo-router";
+import { useEffect, useState } from "react";
 import {
-    FlatList,
-    Image,
-    Pressable,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  Alert,
+  FlatList,
+  Image,
+  Pressable,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
+import LoadingIndicator from "../components/LoadingIndicator.js";
 import colors from "../config/color";
-import { Rootines } from "./Rootine";
+import { useRootine } from "../hooks/useRootine.jsx";
 
 export default function EventInfo({ id }) {
   const router = useRouter();
+  const [refreshing, setRefreshing] = useState(false);
+  const {
+    rootines,
+    deleteExercice,
+    fetchExercicesByRootine,
+    exercices,
+    loading,
+  } = useRootine();
+  const [pressedDelete, setPressedDelete] = useState(false);
 
-  const rootine = Rootines.find((r) => r.id === id);
-  const exercices = rootine?.exercices || [];
+  useEffect(() => {
+    fetchExercicesByRootine(id);
+  }, []);
+
+  if (loading) {
+    return (
+      <View style={styles.centered}>
+        <Text style={styles.loadingText}>Chargement...</Text>
+        <LoadingIndicator />
+      </View>
+    );
+  }
+
+  const rootine = rootines.find((r) => r.id?.toString() === id?.toString());
+
+  const handleDelete = (id) => {
+    setPressedDelete(true);
+    if (!pressedDelete) {
+      Alert.alert(
+        "Confirmer la suppression",
+        "Êtes-vous sûr de vouloir supprimer cet exercice ?",
+        [
+          { text: "Annuler", style: "cancel" },
+          {
+            text: "Supprimer",
+            style: "destructive",
+            onPress: () => {
+              deleteExercice(id);
+              fetchExercicesByRootine(id);
+            },
+          },
+        ],
+      );
+    }
+    setPressedDelete(false);
+  };
   return (
     <>
       <View style={styles.container}>
@@ -26,9 +72,9 @@ export default function EventInfo({ id }) {
           <Entypo name="chevron-left" size={24} color="black" />
         </Pressable>
         <View style={styles.titleContainer}>
-          <Text style={styles.title}>{rootine.nom}</Text>
+          <Text style={styles.title}>{rootine?.nom}</Text>
           <Text style={styles.subTitle}>
-            {rootine.duréeEstimée} - {rootine.jourPrévu}
+            {rootine?.duree_estimee?.slice(0, 5)} - {rootine?.jour_prevu}
           </Text>
         </View>
 
@@ -63,18 +109,19 @@ export default function EventInfo({ id }) {
                 <TouchableOpacity
                   style={styles.trashIcon}
                   activeOpacity={0.5}
-                  onPress={() => {}}
+                  onPress={() => handleDelete(item.exercices.id)}
                 >
                   <EvilIcons name="trash" size={28} color="red" />
                 </TouchableOpacity>
                 <Image
-                  source={{ uri: item.image }}
+                  source={{ uri: item.exercices.image }}
                   style={styles.exerciceImage}
                   resizeMode="contain"
                 />
-                <Text style={styles.exerciceName}>{item.nom}</Text>
+                <Text style={styles.exerciceName}>{item.exercices.nom}</Text>
                 <Text style={styles.exerciceDetails}>
-                  {item.series} séries - {item.repetitions} répétitions
+                  {item.exercices.series} séries - {item.exercices.repetitions}{" "}
+                  répétitions
                 </Text>
               </View>
             )}
@@ -126,7 +173,7 @@ const styles = StyleSheet.create({
     fontWeight: "700",
   },
   exercicesContainer: {
-    marginTop: 150,
+    marginTop: 120,
     paddingHorizontal: 20,
   },
   exerciceCard: {
@@ -205,5 +252,18 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     gap: 5,
     alignItems: "center",
+  },
+  centered: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    flexDirection: "row",
+    gap: 10,
+  },
+  loadingText: {
+    fontSize: 22,
+    color: "#64748B",
+    fontFamily: "Inter",
+    fontWeight: "500",
   },
 });

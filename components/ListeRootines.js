@@ -1,8 +1,11 @@
+import Entypo from "@expo/vector-icons/Entypo";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import { useRouter } from "expo-router";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { useState } from "react";
+import { Alert, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { SvgXml } from "react-native-svg";
 import colors from "../config/color.js";
+import { useRootine } from "../hooks/useRootine.jsx";
 
 export default function ListRootines({ item }) {
   const router = useRouter();
@@ -10,6 +13,27 @@ export default function ListRootines({ item }) {
   <path d="M5 12h11" />
   <path d="M13 6l6 6-6 6" />
 </svg>`;
+  const [pressedDelete, setPressedDelete] = useState(false);
+  const { deleteRootine } = useRootine();
+
+  const handleDelete = () => {
+    setPressedDelete(true);
+    if (!pressedDelete) {
+      Alert.alert(
+        "Confirmer la suppression",
+        "Êtes-vous sûr de vouloir supprimer cette rootine ?",
+        [
+          { text: "Annuler", style: "cancel" },
+          {
+            text: "Supprimer",
+            style: "destructive",
+            onPress: () => deleteRootine(item.id),
+          },
+        ],
+      );
+    }
+    setPressedDelete(false);
+  };
 
   //   const subTitle = `${item.date} at ${item.horaire} - ${item.ville} - ${item.typeEvenement}`;
 
@@ -26,9 +50,15 @@ export default function ListRootines({ item }) {
               <FontAwesome6 name="dumbbell" size={24} color="#65A30D" />
             </Text>
             <Text style={styles.title}>{item.nom}</Text>
-            <Text style={styles.edit}>...</Text>
+            <TouchableOpacity
+              style={styles.delete}
+              onPress={() => handleDelete()}
+            >
+              <Entypo name="cross" size={21} color="black" />
+            </TouchableOpacity>
+
             <Text style={styles.subTitle}>
-              {item.duree_estimee} - {item.jour_prevu}
+              {item.duree_estimee?.slice(0, 5)} - {item.jour_prevu}
             </Text>
           </View>
         </TouchableOpacity>
@@ -113,11 +143,10 @@ const styles = StyleSheet.create({
     margin: 20,
     marginTop: 0,
   },
-  edit: {
+  delete: {
     position: "absolute",
-    top: 10,
-    right: 20,
-    fontSize: 24,
+    top: 12,
+    right: 15,
     color: colors.slate,
   },
   textButton: {

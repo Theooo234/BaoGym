@@ -2,9 +2,10 @@
  * CountdownTimerApp Functional Component
  */
 
-import React, { useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import CountDownTimer from "react-native-countdown-timer-hooks";
+import colors from "../config/color.js";
 
 function CountdownTimerApp() {
   // Timer References
@@ -65,7 +66,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     borderRadius: 35,
-    backgroundColor: "#2196f3",
+    backgroundColor: colors.baogreenSombre,
   },
   timerTextStyle: {
     fontSize: 25,
@@ -89,4 +90,3 @@ const styles = StyleSheet.create({
 });
 
 export default CountdownTimerApp;
-

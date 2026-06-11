@@ -1,50 +1,86 @@
 import Entypo from "@expo/vector-icons/Entypo";
 import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
+import DateTimePicker from "@react-native-community/datetimepicker";
 import { useRouter } from "expo-router";
 import { useState } from "react";
 import {
-    Pressable,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  Image,
+  Platform,
+  Pressable,
+  ScrollView,
+  StatusBar,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import Modal from "react-native-modal";
-import Separation from "../components/Separation.js";
 import colors from "../config/color.js";
 import { useRootine } from "../hooks/useRootine.jsx";
 
-export default function CreerRootine() {
+const createMidnightDate = () => {
+  const midnight = new Date();
+  midnight.setHours(0, 0, 0, 0);
+  return midnight;
+};
+
+export default function CreerRootine({ onChangeTime }) {
   const router = useRouter();
   const { addRootine, rootine, setRootine, exercices } = useRootine();
-  const [loading, setLoading] = useState(false);
   const [isModalVisible, setModalVisible] = useState(false);
-
-  console.log("rootine", rootine);
+  const { serie, setSerie } = useRootine();
 
   const toggleModal = () => {
     setModalVisible(!isModalVisible);
   };
 
-  const handlesubmit = async (e) => {
-    e.preventDefault();
+  const goBackToRootines = () => {
+    if (router.canGoBack()) {
+      router.back();
+      return;
+    }
+
+    router.replace("/home/rootines");
+  };
+
+  const handlesubmit = async () => {
     //faire la validation des champs
     if (!rootine.nom || !rootine.duree || !rootine.jour) {
       alert("Veuillez remplir tous les champs");
       return;
     }
 
-    console.log("Création de la rootine:", rootine);
     await addRootine();
-
-    console.log("Rootine créée ?");
-
-    router.dismiss();
+    goBackToRootines();
   };
   //   const { evenements } = useEvent();
-  console.log("===== CreerRootine ====", rootine);
+
+  const [date, setDate] = useState(createMidnightDate);
+  const [show, setShow] = useState(false);
+
+  const onChange = (event, selectedDate) => {
+    // Sur Android, on ferme le dialog tout de suite après la sélection
+    if (Platform.OS === "android") {
+      setShow(false);
+    }
+
+    if (selectedDate) {
+      setDate(selectedDate);
+      onChangeTime?.(formatTime(selectedDate));
+      setRootine((rootine) => ({
+        ...rootine,
+        duree: formatTime(selectedDate),
+      }));
+    }
+  };
+
+  // Formater l'heure proprement (ex: 08:05)
+  const formatTime = (dateToFormat) => {
+    const hours = dateToFormat.getHours().toString().padStart(2, "0");
+    const minutes = dateToFormat.getMinutes().toString().padStart(2, "0");
+    return `${hours}:${minutes}`;
+  };
 
   return (
     <>
@@ -71,7 +107,14 @@ export default function CreerRootine() {
                 }}
               >
                 <Text style={styles.modalText}>Lundi</Text>
-                <Separation />
+                <View
+                  style={{
+                    backgroundColor: "#E2E8F0",
+                    width: "50%",
+                    height: 1.5,
+                    alignSelf: "center",
+                  }}
+                />
               </Pressable>
               <Pressable
                 style={styles.modalOption}
@@ -81,7 +124,14 @@ export default function CreerRootine() {
                 }}
               >
                 <Text style={styles.modalText}>Mardi</Text>
-                <Separation />
+                <View
+                  style={{
+                    backgroundColor: "#E2E8F0",
+                    width: "50%",
+                    height: 1.5,
+                    alignSelf: "center",
+                  }}
+                />
               </Pressable>
               <Pressable
                 style={styles.modalOption}
@@ -91,7 +141,14 @@ export default function CreerRootine() {
                 }}
               >
                 <Text style={styles.modalText}>Mercredi</Text>
-                <Separation />
+                <View
+                  style={{
+                    backgroundColor: "#E2E8F0",
+                    width: "50%",
+                    height: 1.5,
+                    alignSelf: "center",
+                  }}
+                />
               </Pressable>
               <Pressable
                 style={styles.modalOption}
@@ -101,7 +158,14 @@ export default function CreerRootine() {
                 }}
               >
                 <Text style={styles.modalText}>Jeudi</Text>
-                <Separation />
+                <View
+                  style={{
+                    backgroundColor: "#E2E8F0",
+                    width: "50%",
+                    height: 1.5,
+                    alignSelf: "center",
+                  }}
+                />
               </Pressable>
               <Pressable
                 style={styles.modalOption}
@@ -111,7 +175,14 @@ export default function CreerRootine() {
                 }}
               >
                 <Text style={styles.modalText}>Vendredi</Text>
-                <Separation />
+                <View
+                  style={{
+                    backgroundColor: "#E2E8F0",
+                    width: "50%",
+                    height: 1.5,
+                    alignSelf: "center",
+                  }}
+                />
               </Pressable>
               <Pressable
                 style={styles.modalOption}
@@ -121,7 +192,14 @@ export default function CreerRootine() {
                 }}
               >
                 <Text style={styles.modalText}>Samedi</Text>
-                <Separation />
+                <View
+                  style={{
+                    backgroundColor: "#E2E8F0",
+                    width: "50%",
+                    height: 1.5,
+                    alignSelf: "center",
+                  }}
+                />
               </Pressable>
               <Pressable
                 style={styles.modalOption}
@@ -131,7 +209,14 @@ export default function CreerRootine() {
                 }}
               >
                 <Text style={styles.modalText}>Dimanche</Text>
-                <Separation />
+                <View
+                  style={{
+                    backgroundColor: "#E2E8F0",
+                    width: "50%",
+                    height: 1.5,
+                    alignSelf: "center",
+                  }}
+                />
               </Pressable>
             </ScrollView>
 
@@ -142,7 +227,7 @@ export default function CreerRootine() {
         </Pressable>
       </Modal>
       <View style={styles.container}>
-        <Pressable style={styles.icon} onPress={() => router.back()}>
+        <Pressable style={styles.icon} onPress={goBackToRootines}>
           <Entypo name="chevron-left" size={24} color="black" />
         </Pressable>
         <View style={styles.titleContainer}>
@@ -150,67 +235,230 @@ export default function CreerRootine() {
         </View>
 
         <View style={[styles.ajoutContainer]}>
-          <Pressable style={styles.creerContent} onPress={handlesubmit}>
+          <Pressable
+            style={styles.creerContent}
+            onPress={() => {
+              handlesubmit();
+            }}
+          >
             <Text style={styles.ajoutText}>Créer la Rootine</Text>
           </Pressable>
         </View>
-        <View style={styles.card}>
-          <Text style={styles.label}>NOM DE LA SÉANCE</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Ex: Séance Jambes"
-            placeholderTextColor="#94A3B8"
-            value={rootine.nom}
-            onChangeText={(text) => {
-              setRootine({ ...rootine, nom: text });
-            }}
-          />
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{ paddingBottom: 130 }}
+        >
+          <View style={styles.card}>
+            <Text style={styles.label}>NOM DE LA SÉANCE</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Ex: Séance Jambes"
+              placeholderTextColor="#94A3B8"
+              value={rootine.nom}
+              onChangeText={(text) => {
+                setRootine({ ...rootine, nom: text });
+              }}
+            />
 
-          <Text style={[styles.label, { marginTop: 15 }]}>DURÉE ESTIMÉE</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Ex: 1h 00min"
-            placeholderTextColor="#94A3B8"
-            value={rootine.duree}
-            onChangeText={(text) => {
-              setRootine({ ...rootine, duree: text });
-            }}
-          />
-
-          <Text style={[styles.label, { marginTop: 15 }]}>JOUR </Text>
-          <Pressable
-            style={styles.input}
-            placeholder="Ex: Lundi"
-            onPress={toggleModal}
-          >
-            <Text
-              style={[
-                styles.inputText,
-                { color: rootine.jour ? "#0F172A" : "#94A3B8" },
-              ]}
+            {/* <Text style={[styles.label, { marginTop: 15 }]}>DURÉE ESTIMÉE</Text>
+            <Pressable
+              style={styles.input}
+              placeholder="Ex: 1h 00min"
+              placeholderTextColor="#94A3B8"
+              value={rootine.duree}
+              onChangeText={(text) => {
+                setRootine({ ...rootine, duree: text });
+              }}
             >
-              {rootine.jour || "Sélectionner un jour"}
-            </Text>
-          </Pressable>
-        </View>
+              <Text
+                style={[
+                  styles.inputText,
+                  { color: rootine.jour ? "#0F172A" : "#94A3B8" },
+                ]}
+              >
+                {rootine.jour || "Sélectionner une durée estimée"}
+              </Text>
+            </Pressable> */}
 
-        <View>
-          <Text style={[styles.titleSection, { marginTop: 15 }]}>
-            Exercices ({exercices.length})
-          </Text>
-          <View style={[styles.card, { marginTop: 0 }]}>
-            {/* {exercices == null || exercices.length === 0 ? ()} */}
-            <TouchableOpacity
-              style={styles.creer}
-              onPress={() => router.push("/rootine/add")}
+            <StatusBar barStyle="dark-content" />
+
+            <View style={styles.inputContainer}>
+              <Text style={[styles.label, { marginTop: 15 }]}>
+                DURÉE ESTIMÉE
+              </Text>
+              <Pressable
+                style={styles.input}
+                placeholderTextColor="#94A3B8"
+                onPress={() => setShow(true)}
+              >
+                <Text style={styles.inputText}> {formatTime(date)} </Text>
+              </Pressable>
+
+              {/* LE PICKER NATIF */}
+              {show && (
+                <View
+                  style={
+                    Platform.OS === "ios"
+                      ? styles.iosPickerContainer
+                      : styles.androidPickerContainer
+                  }
+                >
+                  {Platform.OS === "ios" && (
+                    <TouchableOpacity
+                      style={styles.iosCloseButton}
+                      onPress={() => setShow(false)}
+                    >
+                      <Text style={styles.iosCloseButtonText}>OK</Text>
+                    </TouchableOpacity>
+                  )}
+                  <View style={styles.iosPickerTitleContainer}>
+                    <Text style={styles.iosPickerTitle}>
+                      Choisissez une durée
+                    </Text>
+                  </View>
+
+                  <View
+                    style={
+                      Platform.OS === "ios" ? styles.iosPickerWindow : null
+                    }
+                  >
+                    <DateTimePicker
+                      value={date}
+                      mode="time"
+                      is24Hour={true}
+                      display={Platform.OS === "ios" ? "spinner" : "default"}
+                      onChange={onChange}
+                      textColor="#1F2937" // iOS uniquement
+                      style={Platform.OS === "ios" ? styles.iosPicker : null}
+                    />
+                  </View>
+                </View>
+              )}
+            </View>
+
+            <Text style={[styles.label, { marginTop: 15 }]}>JOUR </Text>
+            <Pressable
+              style={styles.input}
+              placeholder="Ex: Lundi"
+              onPress={toggleModal}
             >
-              <View style={styles.creerContent} type="submit">
-                <FontAwesome5 name="plus" size={16} color={colors.baogreen} />
-                <Text style={styles.creerText}>Ajouter un Exercice</Text>
-              </View>
-            </TouchableOpacity>
+              <Text
+                style={[
+                  styles.inputText,
+                  { color: rootine.jour ? "#0F172A" : "#94A3B8" },
+                ]}
+              >
+                {rootine.jour || "Sélectionner un jour"}
+              </Text>
+            </Pressable>
           </View>
-        </View>
+
+          <View>
+            <Text style={[styles.titleSection, { marginTop: 15 }]}>
+              Exercices ({exercices.length})
+            </Text>
+            <View style={[styles.card, { marginTop: 0 }]}>
+              {exercices == null || exercices.length === 0 ? (
+                <View>
+                  <Text
+                    style={{
+                      color: "#64748B",
+                      fontSize: 16,
+                      textAlign: "center",
+                      marginBottom: 10,
+                    }}
+                  >
+                    Aucun exercice ajouté pour le moment
+                  </Text>
+                  <View
+                    style={{
+                      backgroundColor: "#E2E8F0",
+                      width: "70%",
+                      height: 2,
+                      alignSelf: "center",
+                    }}
+                  />
+                </View>
+              ) : (
+                exercices.map((item, index) => (
+                  <View
+                    key={`${item.id}-${index}`}
+                    style={{
+                      backgroundColor: "#F1F5F9",
+                      borderRadius: 16,
+                      padding: 16,
+                      marginBottom: 10,
+                      alignItems: "center",
+                    }}
+                  >
+                    <Image
+                      style={styles.exerciceImage}
+                      source={{ uri: item.image }}
+                      resizeMode="contain"
+                    />
+                    <Text style={{ fontSize: 16, fontWeight: "bold" }}>
+                      {item.nom}
+                    </Text>
+                    <Text style={{ color: "#64748B", marginTop: 4 }}>
+                      {item.nbr_serie} séries x {item.nbr_rep} reps
+                    </Text>
+
+                    <View style={styles.inputContainerBigBoss}>
+                      <View style={styles.inputExoContainer}>
+                        <Text style={styles.inputExoText}>
+                          Séries :{item.nbr_serie}
+                        </Text>
+                        <TextInput
+                          // style={styles.inputExo}
+                          // placeholder="0"
+                          // placeholderTextColor="#94A3B8"
+                          value={item.nbr_serie}
+                          // onChangeText={(text) => {
+                          //   //setRootine({ ...serie, nbr_serie: text });
+                          // }}
+                        />
+                      </View>
+                      <View style={styles.inputExoContainer}>
+                        <Text style={styles.inputExoText}>Reps :</Text>
+                        <TextInput
+                          style={styles.inputExo}
+                          placeholder="0"
+                          placeholderTextColor="#94A3B8"
+                          defaultValue={item.nbr_rep}
+                          onChangeText={(text) => {
+                            //setRootine({ ...serie, nbr_rep: text });
+                          }}
+                        />
+                      </View>
+                      <View style={styles.inputExoContainer}>
+                        <Text style={styles.inputExoText}>Poids :</Text>
+                        <TextInput
+                          style={styles.inputExo}
+                          placeholder="0"
+                          placeholderTextColor="#94A3B8"
+                          value={item.poids}
+                          onChangeText={(text) => {
+                            //setSerie({ ...serie, poids: text });
+                          }}
+                        />
+                      </View>
+                    </View>
+                  </View>
+                ))
+              )}
+
+              <TouchableOpacity
+                style={styles.creer}
+                onPress={() => router.push("/rootine/add")}
+              >
+                <View style={styles.creerContent} type="submit">
+                  <FontAwesome5 name="plus" size={16} color={colors.baogreen} />
+                  <Text style={styles.creerText}>Ajouter un Exercice</Text>
+                </View>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </ScrollView>
       </View>
     </>
   );
@@ -233,17 +481,24 @@ const styles = StyleSheet.create({
     backgroundColor: "#ffffff",
     alignItems: "center",
     justifyContent: "center",
-    zIndex: 1,
+    zIndex: 10,
     borderWidth: 1,
     borderColor: "#E2E8F0",
   },
   titleContainer: {
     position: "absolute",
-    top: 57,
-    left: 85,
-    right: 20,
+    top: 42,
+    left: 0,
+    right: 0,
+    minHeight: 75,
     flexDirection: "column",
     alignItems: "flex-start",
+    backgroundColor: "#f9fcf8",
+    zIndex: 2,
+    elevation: 2,
+    justifyContent: "center",
+    paddingLeft: 85,
+    paddingRight: 20,
   },
   title: {
     fontSize: 24,
@@ -345,7 +600,7 @@ const styles = StyleSheet.create({
     fontWeight: "500",
     color: "#0F172A",
     fontFamily: "Inter",
-    marginVertical: 10,
+    marginBottom: 15,
   },
   button: {
     backgroundColor: colors.baogreen,
@@ -389,5 +644,100 @@ const styles = StyleSheet.create({
   },
   ScrollView: {
     width: "100%",
+  },
+  exerciceImage: {
+    width: "90%",
+    height: 150,
+    borderRadius: 8,
+    marginBottom: 10,
+    backgroundColor: "#ffffff",
+    borderWidth: 1,
+    borderColor: "#E2E8F0",
+    borderStyle: "solid",
+  },
+  // -- STYLES SPECIFIQUES POUR IOS (Car iOS affiche le spinner directement dans l'écran) --
+  iosPickerContainer: {
+    position: "absolute",
+    top: 32,
+    left: 0,
+    right: 0,
+    backgroundColor: "white",
+    height: 150,
+    width: "100%",
+    borderRadius: 16,
+    // borderTopRightRadius: 24,
+    zIndex: 9999,
+    borderWidth: 1,
+    borderColor: "#E2E8F0",
+  },
+  androidPickerContainer: {
+    position: "absolute",
+    top: 45,
+    left: 0,
+    right: 0,
+    zIndex: 9999,
+  },
+  iosPickerWindow: {
+    height: 102,
+    overflow: "hidden",
+    justifyContent: "center",
+  },
+  iosPicker: {
+    height: 90,
+    alignSelf: "center",
+  },
+  iosCloseButton: {
+    alignSelf: "flex-end",
+    padding: 16,
+  },
+  iosCloseButtonText: {
+    color: colors.baogreen,
+    fontWeight: "700",
+    fontSize: 16,
+    right: 10,
+  },
+  iosPickerTitleContainer: {
+    position: "absolute",
+    top: 16,
+    left: 16,
+  },
+  iosPickerTitle: {
+    fontSize: 16,
+    fontWeight: "bold",
+    color: colors.baogreen,
+  },
+  inputContainer: {
+    width: "100%",
+    position: "relative",
+    zIndex: 9999,
+  },
+  inputExoContainer: { width: "30%", alignItems: "center" },
+  inputExo: {
+    borderWidth: 1,
+    borderColor: "#E2E8F0",
+    borderRadius: 16,
+    padding: 16,
+    fontSize: 16,
+    fontWeight: "bold",
+    color: "#0F172A",
+    backgroundColor: "white",
+    width: "100%",
+    marginTop: 0,
+    textAlign: "center",
+  },
+  inputExoText: {
+    fontSize: 10,
+    fontWeight: "bold",
+    color: "#64748B",
+    marginBottom: 6,
+    letterSpacing: 1,
+    marginTop: 15,
+  },
+  inputContainerBigBoss: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    width: "100%",
+    position: "relative",
+    zIndex: 9999,
   },
 });

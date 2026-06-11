@@ -8,6 +8,7 @@
 
 import { Slot, Stack, useRouter, useSegments } from 'expo-router';
 import { useEffect, useState } from 'react';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { supabase } from '../lib/supabase';
 import { RootineProvider } from "../provider/RootineProvider.jsx";
 
@@ -47,15 +48,17 @@ export default function RootLayout() {
   }, [session, segments, loading]);
 
   return (
-    <RootineProvider>
-      <Stack
-        screenOptions={{
-          headerShown: false,
-          animation: 'slide_from_right',
-        }}
-      >
-        <Slot />
-      </Stack>
-    </RootineProvider>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <RootineProvider>
+        <Stack
+          screenOptions={{
+            headerShown: false,
+            animation: 'slide_from_right',
+          }}
+        >
+          <Slot />
+        </Stack>
+      </RootineProvider>
+    </GestureHandlerRootView>
   );
 }

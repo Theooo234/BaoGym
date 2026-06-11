@@ -9,10 +9,10 @@ import {
 } from "react-native";
 import ListExercices from "../components/ListeRootines.js";
 import ListItemSeparator from "../components/ListItemSeparator.js";
+import LoadingIndicator from "../components/LoadingIndicator.js";
 import Screen from "../components/Screen.js";
 import colors from "../config/color.js";
 import { useRootine } from "../hooks/useRootine.jsx";
-
 export const Rootines = [
   {
     id: "67",
@@ -187,9 +187,16 @@ export const Rootines = [
 ];
 
 export default function Rootine() {
-  const { rootines } = useRootine();
+  const { rootines, loading } = useRootine();
   const router = useRouter();
-  console.log("Rootines dans Rootine.js", rootines);
+  if (loading) {
+    return (
+      <View style={styles.centered}>
+        <Text style={styles.loadingText}>Chargement...</Text>
+        <LoadingIndicator />
+      </View>
+    );
+  }
 
   //   const { evenements } = useEvent();
 
@@ -208,7 +215,7 @@ export default function Rootine() {
             }}
             data={rootines}
             showsVerticalScrollIndicator={false}
-            contentContainerStyle={{ paddingBottom: 230 }}
+            contentContainerStyle={{ paddingBottom: 300 }}
             keyExtractor={(item) => item.id}
             //renderItem={({ item }) => <Text>{item.typeEvenement}</Text>}
             renderItem={({ item }) => <ListExercices item={item} />}
@@ -262,5 +269,18 @@ const styles = StyleSheet.create({
     color: "#65A30D",
     fontSize: 18,
     fontWeight: "bold",
+  },
+  centered: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    flexDirection: "row",
+    gap: 10,
+  },
+  loadingText: {
+    fontSize: 22,
+    color: "#64748B",
+    fontFamily: "Inter",
+    fontWeight: "500",
   },
 });
