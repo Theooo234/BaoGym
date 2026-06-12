@@ -2,7 +2,8 @@ import Entypo from "@expo/vector-icons/Entypo";
 import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 import { useRouter } from "expo-router";
 import { useEffect } from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { FlatList, Pressable, StyleSheet, Text, View } from "react-native";
+import ExerciceItem from "../components/ExerciceItem.js";
 import LoadingIndicator from "../components/LoadingIndicator.js";
 import colors from "../config/color";
 import { useRootine } from "../hooks/useRootine.jsx";
@@ -15,11 +16,11 @@ export default function EventInfo({ id }) {
   useEffect(() => {
     const fetchData = async () => {
       await fetchExercicesByRootine(id);
-      //await fetchSerie();
     };
 
     fetchData();
-  }, [id, fetchExercicesByRootine]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id]);
 
   console.log("RENDER", id);
   const rootine = rootines.find((r) => r.id?.toString() === id?.toString());
@@ -58,7 +59,7 @@ export default function EventInfo({ id }) {
           </View>
         </View>
 
-        {/* <View style={styles.exercicesContainer}>
+        <View style={styles.exercicesContainer}>
           <FlatList
             style={{
               width: "100%",
@@ -76,7 +77,7 @@ export default function EventInfo({ id }) {
               <ExerciceItem exercice={item} rootineId={id} />
             )}
           />
-        </View> */}
+        </View>
       </View>
     </>
   );

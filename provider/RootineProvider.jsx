@@ -122,17 +122,17 @@ const addExercices = async (rootineId) => {
     try {
       // Insert exercises
 
-      const exercicesToInsert = exercices.map(ex => ({
-        nom: ex.nom,
-        image: ex.image,
-        description: ex.description,
-      }));
 
-      // for each exercice, insert it and get its id, then insert the relation with the routine and insert the series
-      for (const ex of exercicesToInsert) {
+      for (const ex of exercices) {
+        const exerviceToInsert = {
+          nom: ex.nom,
+          image: ex.image,
+          description: ex.description,
+        };
+
         const { data: insertedExercice, error: exerciceError } = await supabase
           .from('exercices')
-          .insert(ex)
+          .insert(exerviceToInsert)
           .select()
           .single()
 
@@ -150,8 +150,40 @@ const addExercices = async (rootineId) => {
         if (relationError) throw relationError;
 
         // creer les séries pour chaque exercice
-        await addSerie(insertedExercice.id);
+        await addSerie(insertedExercice.id, ex.poids, ex.nbr_rep, ex.nbr_serie);
       }
+
+
+      // const exercicesToInsert = exercices.map(ex => ({
+      //   nom: ex.nom,
+      //   image: ex.image,
+      //   description: ex.description,
+      // }));
+
+      // // for each exercice, insert it and get its id, then insert the relation with the routine and insert the series
+      // for (const ex of exercicesToInsert) {
+      //   const { data: insertedExercice, error: exerciceError } = await supabase
+      //     .from('exercices')
+      //     .insert(ex)
+      //     .select()
+      //     .single()
+
+      //   if (exerciceError) throw exerciceError;
+
+      //   // creer la relation entre la routine et l'exercice
+      //   const { error: relationError } = await supabase
+      //     .from('routine_exercices')
+      //     .insert({
+      //       routine_id: rootineId,
+      //       exercice_id: insertedExercice.id,
+      //     })
+      //     .select()
+
+      //   if (relationError) throw relationError;
+
+      //   // creer les séries pour chaque exercice
+      //   await addSerie(insertedExercice.id);
+      // }
 
     } catch (error) {
       Alert.alert('Erreur', error.message);
@@ -257,29 +289,24 @@ const addExercices = async (rootineId) => {
     }
   };
 
-  const addSerie = async (exerciceId)  => {
+  const addSerie = async (exerciceId, poids, nbr_rep, nbr_serie)  => {
     setLoading(true);
 
     try {
   
-      console.log("addSeries", exercices)
+      for (let i = 0; i < nbr_serie; i++) {
+        const { data: insertedSerie, error: SerieError } = await supabase
+          .from('series')
+          .insert({
+            exercice_id: exerciceId,
+            poids: poids || 0,
+            nbr_rep: nbr_rep || 0,
+          })
+          .select()
+          .single()
 
-      const SerieToInsert = exercices.map(ex => ({
-        exercice_id: exerciceId,
-        poids: ex.poids || 0,
-        nbr_rep: ex.nbr_rep || 0,
-      }));
-
-      console.log("addSeries", SerieToInsert)
-
-      const { data: insertedSerie, error: SerieError } = await supabase
-        .from('series')
-        .insert(SerieToInsert)
-        .select()
-
-    if (SerieError) throw SerieError;
-      
-
+        if (SerieError) throw SerieError;
+      }
       } catch (error) {
         Alert.alert('Erreur', error.message);
       } finally {

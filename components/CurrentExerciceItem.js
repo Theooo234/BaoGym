@@ -1,97 +1,103 @@
-import Entypo from "@expo/vector-icons/Entypo";
-import { useRouter } from "expo-router";
+import { Feather, Ionicons } from "@expo/vector-icons";
 import { useEffect, useState } from "react";
 import {
-  FlatList,
-  Pressable,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View
+    Alert,
+    Image,
+    Pressable,
+    StyleSheet,
+    Text,
+    TextInput,
+    View,
 } from "react-native";
-import CurrentExerciceItem from "../components/CurrentExerciceItem.js";
-import colors from "../config/color";
-import { useAutoTimer } from "../hooks/UseAutoTimer";
+import colors from "../config/color.js";
 import { useRootine } from "../hooks/useRootine.jsx";
+import { supabase } from "../lib/supabase.js";
 
-export default function EventInfo({ id }) {
-  const router = useRouter();
-  const { rootines, exercices, fetchExercicesByRootine } = useRootine();
-
+export default function CurrentExerciceItem({ rootineId, exercice }) {
   const [serie, setSerie] = useState([]);
+  const [isChecked, setIsChecked] = useState(false);
+  const { deleteExercice, fetchExercicesByRootine, rootines } = useRootine();
 
-  const rootine = rootines.find((r) => r.id?.toString() === id?.toString());
-
-  const { tempsFormate } = useAutoTimer();
+  const rootine = rootines.find(
+    (r) => r.id?.toString() === rootineId?.toString(),
+  );
 
   useEffect(() => {
-    const fetchData = async () => {
-      await fetchExercicesByRootine(id);
-      //await fetchSerie();
-    };
+    fetchSerie(exercice.exercices.id);
+  }, [exercice.exercices.id]);
 
-    fetchData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [id]);
+  const fetchSerie = async (exerciceId) => {
+    try {
+      const { data, error } = await supabase
+        .from("series")
+        .select("*")
+        .eq("exercice_id", exerciceId);
 
-  if (!rootine) {
-    return (
-      <View style={styles.container}>
-        <Text style={styles.title}>Routine introuvable</Text>
-      </View>
-    );
-  }
-
+      if (error) throw error;
+      setSerie(data || []);
+      console.log("Séries pour l'exercice", data);
+    } catch (error) {
+      Alert.alert("Erreur", "Impossible de charger les séries.");
+    } finally {
+    }
+  };
   const SerieItem = () => {
     const elt = [];
 
     for (let i = 0; i < serie.length; i++) {
       elt.push(
-        <Text style={styles.exerciceDetails}>
-          {serie.length} séries : {serie[i]?.nbr_rep} x {serie[i]?.poids} kg
-        </Text>,
+        <View style={styles.allInput}>
+          <View style={styles.serieNbrContainer}>
+            <Text style={styles.serieNbr}>{i + 1}</Text>
+          </View>
+          <TextInput
+            style={styles.input}
+            placeholder="0"
+            placeholderTextColor="#94A3B8"
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="0"
+            placeholderTextColor="#94A3B8"
+          />
+          <Pressable
+            style={styles.CheckboxContainer}
+            onPress={() => setIsChecked(!isChecked)}
+          >
+            <Ionicons
+              name={isChecked ? "checkbox" : "square-outline"}
+              size={24}
+              color={isChecked ? "#4CAF50" : "#757575"}
+            />
+          </Pressable>
+        </View>,
       );
     }
     return elt;
   };
 
   return (
-    <>
-      <View style={styles.container}>
-        <Pressable style={styles.icon} onPress={() => router.back()}>
-          <Entypo name="chevron-left" size={24} color="black" />
-        </Pressable>
-        <View style={styles.titleContainer}>
-          <Text style={styles.title}>{rootine.nom}</Text>
-          <Text style={styles.compteur}>{tempsFormate}</Text>
-        </View>
-        <TouchableOpacity style={[styles.ajoutContainer]}>
-          <View style={styles.creerContent}>
-            <Text style={styles.ajoutText}>Terminer la Rootine</Text>
-          </View>
-        </TouchableOpacity>
-
-        <View style={styles.exercicesContainer}>
-          <FlatList
-            style={{
-              width: "100%",
-              padding: 20,
-              backgroundColor: "#f9fcf8",
-            }}
-            data={exercices}
-            showsVerticalScrollIndicator={false}
-            contentContainerStyle={{ paddingBottom: 90 }}
-            keyExtractor={(item) => item.exercices.id}
-            bounces={false}
-            overScrollMode="never"
-            //renderItem={({ item }) => <Text>{item.typeEvenement}</Text>}
-            renderItem={({ item }) => (
-              <CurrentExerciceItem exercice={item} rootineId={id} />
-            )}
-          />
-        </View>
+    <View key={exercice.exercices.id} style={styles.exerciceCard}>
+      <Image
+        source={{ uri: exercice.exercices.image }}
+        style={styles.exerciceImage}
+        resizeMode="contain"
+      />
+      <Text style={styles.exerciceName}>{exercice.exercices.nom}</Text>
+      <View style={styles.statContainer}>
+        <Text style={styles.kgText}>Série</Text>
+        <Text style={styles.kgText}>kg</Text>
+        <Text style={[styles.repText, { left: 15 }]}>reps</Text>
+        <Text style={styles.repText}>Réussi</Text>
       </View>
-    </>
+
+      <SerieItem />
+
+      <Pressable style={styles.addButton}>
+        <Feather name="plus" style={styles.addIcon} />
+        <Text style={styles.addText}>Ajouter une série</Text>
+      </Pressable>
+    </View>
   );
 }
 
@@ -140,7 +146,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   exerciceCard: {
-    backgroundColor: "#E2E8F0",
+    backgroundColor: "#f7f7f7",
     // backgroundColor: "#f7f7f7",
     borderRadius: 12,
     padding: 15,
@@ -218,30 +224,37 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   allInput: {
-    backgroundColor: "#E2E8F0",
+    backgroundColor: "#ffffff",
     width: "100%",
     paddingHorizontal: 5,
+    borderRadius: 8,
     alignItems: "center",
     flexDirection: "row",
     marginTop: 10,
+    paddingVertical: 10,
     display: "flex",
     justifyContent: "space-around",
   },
   input: {
-    backgroundColor: "#ffffff",
+    backgroundColor: "#f7f7f7",
     borderWidth: 1,
-    borderColor: "#E2E8F0",
+    borderColor: "#f7f7f7",
     borderRadius: 8,
     padding: 10,
+    width: 50,
     fontSize: 14,
     fontWeight: "bold",
     color: "#0F172A",
+    textAlign: "center",
   },
   addButton: {
+    flexDirection: "row",
+    color: colors.white,
+    marginTop: 10,
     backgroundColor: colors.baogreen,
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    width: "100%",
+    height: 45,
+    borderRadius: 15,
     alignItems: "center",
     justifyContent: "center",
   },
@@ -263,9 +276,15 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   statContainer: {
+    marginTop: 10,
     display: "flex",
     flexDirection: "row",
-    justifyContent: "space-beetween",
-    gap: 62,
+    gap: 45,
+  },
+  addText: {
+    color: colors.white,
+    fontSize: 16,
+    fontWeight: "700",
+    fontFamily: "Monserrat",
   },
 });

@@ -8,17 +8,15 @@ import { supabase } from "../lib/supabase.js";
 
 export default function ExerciceItem({ rootineId, exercice }) {
   const [pressedDelete, setPressedDelete] = useState(false);
-  const { deleteExercice, fetchExercicesByRootine, setLoading, loading } =
-    useRootine();
+  const { deleteExercice, fetchExercicesByRootine } = useRootine();
   const [serie, setSerie] = useState([]);
   const [incrementation, setIncrementation] = useState(0);
 
   useEffect(() => {
     fetchSerie(exercice.exercices.id);
-  }, [rootineId, exercice.exercices.id]);
+  }, [exercice.exercices.id]);
 
   const fetchSerie = async (exerciceId) => {
-    setLoading(true);
     try {
       const { data, error } = await supabase
         .from("series")
@@ -31,7 +29,6 @@ export default function ExerciceItem({ rootineId, exercice }) {
     } catch (error) {
       Alert.alert("Erreur", "Impossible de charger les séries.");
     } finally {
-      setLoading(false);
     }
   };
 
@@ -46,9 +43,9 @@ export default function ExerciceItem({ rootineId, exercice }) {
           {
             text: "Supprimer",
             style: "destructive",
-            onPress: () => {
-              deleteExercice(id);
-              fetchExercicesByRootine(rootineId);
+            onPress: async () => {
+              await deleteExercice(id);
+              await fetchExercicesByRootine(rootineId);
             },
           },
         ],
@@ -57,7 +54,19 @@ export default function ExerciceItem({ rootineId, exercice }) {
     setPressedDelete(false);
   };
 
-  const increment = setIncrementation + 1;
+  const SerieItem = () => {
+    const elt = [];
+
+    for (let i = 0; i < serie.length; i++) {
+      elt.push(
+        <Text style={styles.exerciceDetails}>
+          {serie.length} séries : {serie[i]?.nbr_rep} x {serie[i]?.poids} kg
+        </Text>,
+      );
+    }
+    return elt;
+  };
+
   return (
     <View key={exercice.id} style={styles.exerciceCard}>
       <TouchableOpacity
@@ -74,8 +83,7 @@ export default function ExerciceItem({ rootineId, exercice }) {
       />
       <Text style={styles.exerciceName}>{exercice.exercices.nom}</Text>
       <Text style={styles.exerciceDetails}>
-        {serie[incrementation]?.nbr_serie}3 séries :{" "}
-        {serie[incrementation]?.nbr_rep} x {serie[incrementation]?.poids} kg
+        {serie.length} séries : {serie[0]?.nbr_rep} x {serie[0]?.poids} kg
       </Text>
     </View>
   );
