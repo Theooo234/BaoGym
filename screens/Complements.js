@@ -2,14 +2,15 @@ import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import {
-    FlatList,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  FlatList,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import ListComplements from "../components/ListeComplements.js";
 import ListItemSeparator from "../components/ListItemSeparator.js";
+import Picker from "../components/Picker.js";
 import Screen from "../components/Screen.js";
 import colors from "../config/color.js";
 
@@ -121,6 +122,7 @@ export default function Complements() {
             <Text>Temps restant : {formatTime(secondsLeft)}</Text>
           </View> */}
         </View>
+        <Picker />
       </View>
     </Screen>
   );

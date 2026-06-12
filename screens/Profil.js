@@ -41,6 +41,8 @@ export default function Profil(props) {
     new Date(2026, 5, 6), // 6 juin 2026
     new Date(2026, 5, 8), // 8 juin 2026
     new Date(2026, 5, 9), // 9 juin 2026
+    new Date(2026, 5, 10), // 10 juin 2026
+    new Date(2026, 5, 12), // 12 juin 2026
   ];
 
   // Convertir les dates marquées en calendarActiveDateRanges

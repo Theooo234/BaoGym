@@ -18,6 +18,8 @@ const RootineContext = createContext({
   serie: [],
   addSerie: () => { },
   setSerie: () => { },
+  updateExercice: () => { },
+  setLoading: () => { },
 });
 
 
@@ -38,12 +40,13 @@ export function RootineProvider({ children }) {
   const addExerciceToRootine = (exerciceDeBase) => {
 
     const exo = { 
+      id: Date.now().toString(),
       nom: exerciceDeBase.nom, 
       image: exerciceDeBase.image, 
       description: exerciceDeBase.description,
-      poids : 10, 
-      nbr_rep : 20, 
-      nbr_serie : 30
+      poids : 0, 
+      nbr_rep : 0, 
+      nbr_serie : 0
     }
 
     setExercices([...exercices, exo]);
@@ -120,34 +123,35 @@ const addExercices = async (rootineId) => {
       // Insert exercises
 
       const exercicesToInsert = exercices.map(ex => ({
-        nom: ex.nom.trim(),
-        image: ex.image.trim() || null,
-        description: ex.description || null,
-
+        nom: ex.nom,
+        image: ex.image,
+        description: ex.description,
       }));
 
-      const { data: insertedExercices, error: exercicesError } = await supabase
-        .from('exercices')
-        .insert(exercicesToInsert)
-        .select()
+      // for each exercice, insert it and get its id, then insert the relation with the routine and insert the series
+      for (const ex of exercicesToInsert) {
+        const { data: insertedExercice, error: exerciceError } = await supabase
+          .from('exercices')
+          .insert(ex)
+          .select()
+          .single()
 
-      if (exercicesError) throw exercicesError;
+        if (exerciceError) throw exerciceError;
 
-      // creer la relation entre la routine et les exercices
-      const relationsToInsert = insertedExercices.map((exercice) => ({
-        routine_id: rootineId,
-        exercice_id: exercice.id,
-      }));
+        // creer la relation entre la routine et l'exercice
+        const { error: relationError } = await supabase
+          .from('routine_exercices')
+          .insert({
+            routine_id: rootineId,
+            exercice_id: insertedExercice.id,
+          })
+          .select()
 
-      // creer les séries pour chaque exercice
-      addSerie()
+        if (relationError) throw relationError;
 
-      const { error: relationsError } = await supabase
-        .from('routine_exercices')
-        .insert(relationsToInsert)
-        .select()
-
-      if (relationsError) throw relationsError;
+        // creer les séries pour chaque exercice
+        await addSerie(insertedExercice.id);
+      }
 
     } catch (error) {
       Alert.alert('Erreur', error.message);
@@ -253,17 +257,21 @@ const addExercices = async (rootineId) => {
     }
   };
 
-  const addSerie = async ()  => {
+  const addSerie = async (exerciceId)  => {
     setLoading(true);
 
     try {
   
+      console.log("addSeries", exercices)
+
       const SerieToInsert = exercices.map(ex => ({
-        exercice_id: ex.id,
-        poids: ex.poids.trim(),
-        nbr_rep: ex.nbr_rep.trim() || null,
-  
+        exercice_id: exerciceId,
+        poids: ex.poids || 0,
+        nbr_rep: ex.nbr_rep || 0,
       }));
+
+      console.log("addSeries", SerieToInsert)
+
       const { data: insertedSerie, error: SerieError } = await supabase
         .from('series')
         .insert(SerieToInsert)
@@ -272,7 +280,6 @@ const addExercices = async (rootineId) => {
     if (SerieError) throw SerieError;
       
 
-    Alert.alert('Succès', 'Série ajoutée avec succès');
       } catch (error) {
         Alert.alert('Erreur', error.message);
       } finally {
@@ -280,6 +287,22 @@ const addExercices = async (rootineId) => {
         getRootines();
       }
     }
+
+
+
+      const updateExercice = (id , updates) => {
+        const index = exercices.findIndex(ex => ex.id === id);
+        if (index !== -1) {
+          const updatedExercices = {...exercices[index], ...updates};
+          const newExercices = [...exercices];
+          newExercices[index] = updatedExercices;
+          setExercices(newExercices);
+        }
+
+    
+      }
+
+
 
 
 
@@ -302,6 +325,8 @@ const addExercices = async (rootineId) => {
           serie,
           setSerie,
           addSerie,
+          updateExercice,
+          setLoading
         }}
       >
         {children}

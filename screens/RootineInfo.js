@@ -1,37 +1,28 @@
 import Entypo from "@expo/vector-icons/Entypo";
-import EvilIcons from "@expo/vector-icons/EvilIcons";
 import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 import { useRouter } from "expo-router";
-import { useEffect, useState } from "react";
-import {
-  Alert,
-  FlatList,
-  Image,
-  Pressable,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { useEffect } from "react";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 import LoadingIndicator from "../components/LoadingIndicator.js";
 import colors from "../config/color";
 import { useRootine } from "../hooks/useRootine.jsx";
 
 export default function EventInfo({ id }) {
   const router = useRouter();
-  const [refreshing, setRefreshing] = useState(false);
-  const {
-    rootines,
-    deleteExercice,
-    fetchExercicesByRootine,
-    exercices,
-    loading,
-  } = useRootine();
-  const [pressedDelete, setPressedDelete] = useState(false);
+  const { rootines, fetchExercicesByRootine, exercices, loading } =
+    useRootine();
 
   useEffect(() => {
-    fetchExercicesByRootine(id);
-  }, []);
+    const fetchData = async () => {
+      await fetchExercicesByRootine(id);
+      //await fetchSerie();
+    };
+
+    fetchData();
+  }, [id, fetchExercicesByRootine]);
+
+  console.log("RENDER", id);
+  const rootine = rootines.find((r) => r.id?.toString() === id?.toString());
 
   if (loading) {
     return (
@@ -42,29 +33,6 @@ export default function EventInfo({ id }) {
     );
   }
 
-  const rootine = rootines.find((r) => r.id?.toString() === id?.toString());
-
-  const handleDelete = (id) => {
-    setPressedDelete(true);
-    if (!pressedDelete) {
-      Alert.alert(
-        "Confirmer la suppression",
-        "Êtes-vous sûr de vouloir supprimer cet exercice ?",
-        [
-          { text: "Annuler", style: "cancel" },
-          {
-            text: "Supprimer",
-            style: "destructive",
-            onPress: () => {
-              deleteExercice(id);
-              fetchExercicesByRootine(id);
-            },
-          },
-        ],
-      );
-    }
-    setPressedDelete(false);
-  };
   return (
     <>
       <View style={styles.container}>
@@ -90,7 +58,7 @@ export default function EventInfo({ id }) {
           </View>
         </View>
 
-        <View style={styles.exercicesContainer}>
+        {/* <View style={styles.exercicesContainer}>
           <FlatList
             style={{
               width: "100%",
@@ -105,28 +73,10 @@ export default function EventInfo({ id }) {
             overScrollMode="never"
             //renderItem={({ item }) => <Text>{item.typeEvenement}</Text>}
             renderItem={({ item }) => (
-              <View key={item.id} style={styles.exerciceCard}>
-                <TouchableOpacity
-                  style={styles.trashIcon}
-                  activeOpacity={0.5}
-                  onPress={() => handleDelete(item.exercices.id)}
-                >
-                  <EvilIcons name="trash" size={28} color="red" />
-                </TouchableOpacity>
-                <Image
-                  source={{ uri: item.exercices.image }}
-                  style={styles.exerciceImage}
-                  resizeMode="contain"
-                />
-                <Text style={styles.exerciceName}>{item.exercices.nom}</Text>
-                <Text style={styles.exerciceDetails}>
-                  {item.exercices.series} séries - {item.exercices.repetitions}{" "}
-                  répétitions
-                </Text>
-              </View>
+              <ExerciceItem exercice={item} rootineId={id} />
             )}
           />
-        </View>
+        </View> */}
       </View>
     </>
   );

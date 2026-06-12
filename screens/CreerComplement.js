@@ -4,11 +4,34 @@ import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { useRouter } from "expo-router";
 import { useState } from "react";
-import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
+import {
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from "react-native";
+import Modal from "react-native-modal";
+import Picker from "../components/Picker.js";
 import Screen from "../components/Screen.js";
 import colors from "../config/color.js";
+
 export default function CreerComplement() {
   const router = useRouter();
+  const [isModalVisible, setModalVisible] = useState(false);
+
+  const [complement, setComplement] = useState({
+    nom: "",
+    dosage: "",
+    format: "",
+    jour: "",
+    heure: "",
+  });
+
+  const toggleModal = () => {
+    setModalVisible(!isModalVisible);
+  };
 
   const [selectedDays, setSelectedDays] = useState({
     L: false,
@@ -76,252 +99,326 @@ export default function CreerComplement() {
   };
 
   return (
-    <Screen>
-      <View style={styles.background}>
-        <View style={styles.topContainer}>
-          <Pressable style={styles.icon} onPress={() => router.back()}>
-            <Entypo name="chevron-left" size={24} color="black" />
-          </Pressable>
-          <View style={styles.titleContainer}>
-            <Text style={styles.title}>Nouveau Complément</Text>
-          </View>
-        </View>
-        <View style={styles.inputContainer}>
-          <Text style={styles.inputTitle}>Informations</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Nom du complément (ex: Magnésium)"
-            placeholderTextColor="#999595"
-          />
-          <TextInput
-            style={styles.input}
-            placeholder="Dosage (ex: 400mg)"
-            placeholderTextColor="#999595"
-          />
-        </View>
+    <>
+      <Modal isVisible={isModalVisible} style={{ margin: 0 }}>
+        <Pressable style={styles.modalOverlay} onPress={toggleModal}>
+          <View
+            style={{
+              backgroundColor: "white",
+              borderRadius: 20,
+              justifyContent: "center",
+              alignItems: "center",
+              maxHeight: "60%",
+              padding: 20,
+            }}
+          >
+            <ScrollView
+              showsVerticalScrollIndicator={false}
+              style={styles.ScrollView}
+            >
+              <Pressable
+                style={styles.modalOption}
+                onPress={() => {
+                  setComplement({ ...complement, jour: "Créatine" });
+                  toggleModal();
+                }}
+              >
+                <Text style={styles.modalText}>Créatine</Text>
+                <View
+                  style={{
+                    backgroundColor: "#E2E8F0",
+                    width: "50%",
+                    height: 1.5,
+                    alignSelf: "center",
+                  }}
+                />
+              </Pressable>
+              <Pressable
+                style={styles.modalOption}
+                onPress={() => {
+                  setComplement({ ...complement, jour: "Whey" });
+                  toggleModal();
+                }}
+              >
+                <Text style={styles.modalText}>Whey</Text>
+                <View
+                  style={{
+                    backgroundColor: "#E2E8F0",
+                    width: "50%",
+                    height: 1.5,
+                    alignSelf: "center",
+                  }}
+                />
+              </Pressable>
+            </ScrollView>
 
-        <View style={styles.formatContainer}>
-          <Text style={styles.formatTitle}>Format</Text>
-          <View style={styles.formatOptions}>
-            <Pressable
-              style={[
-                styles.format,
-                selectedFormat.pill && styles.formatSelected,
-              ]}
-              onPress={() => toggleFormat("pill")}
-            >
-              <MaterialCommunityIcons
-                name="pill"
-                style={[
-                  styles.formatIcon,
-                  selectedFormat.pill && styles.formatIconSelected,
-                ]}
-              />
-              <Text
-                style={[
-                  styles.formatText,
-                  selectedFormat.pill && styles.formatTextSelected,
-                ]}
-              >
-                Pillule
-              </Text>
+            <Pressable style={styles.modalCloseButton} onPress={toggleModal}>
+              <Text style={styles.modalCloseText}> Selectionner </Text>
             </Pressable>
-            <Pressable
-              style={[
-                styles.format,
-                selectedFormat.caps && styles.formatSelected,
-              ]}
-              onPress={() => toggleFormat("caps")}
-            >
-              <AntDesign
-                name="medicine-box"
-                style={[
-                  styles.formatIcon,
-                  selectedFormat.caps && styles.formatIconSelected,
-                ]}
+          </View>
+        </Pressable>
+      </Modal>
+      <Screen>
+        <View style={styles.background}>
+          <View style={styles.topContainer}>
+            <Pressable style={styles.icon} onPress={() => router.back()}>
+              <Entypo name="chevron-left" size={24} color="black" />
+            </Pressable>
+            <View style={styles.titleContainer}>
+              <Text style={styles.title}>Nouveau Complément</Text>
+            </View>
+          </View>
+          <ScrollView>
+            <View style={styles.inputContainer}>
+              <Text style={styles.inputTitle}>Informations</Text>
+              <Pressable
+                style={styles.input}
+                placeholder="Ex: Lundi"
+                onPress={toggleModal}
+              >
+                <Text
+                  style={[
+                    styles.inputText,
+                    { color: complement.nom ? "#0F172A" : "#94A3B8" },
+                  ]}
+                >
+                  {complement.nom || "Sélectionner un complément"}
+                </Text>
+              </Pressable>
+              <TextInput
+                style={styles.input}
+                placeholder="Dosage (ex: 400mg)"
+                placeholderTextColor="#999595"
               />
+            </View>
 
-              <Text
-                style={[
-                  styles.formatText,
-                  selectedFormat.caps && styles.formatTextSelected,
-                ]}
-              >
-                Capsule
-              </Text>
-            </Pressable>
-            <Pressable
-              style={[
-                styles.format,
-                selectedFormat.liqu && styles.formatSelected,
-              ]}
-              onPress={() => toggleFormat("liqu")}
-            >
-              <FontAwesome6
-                name="droplet"
-                style={[
-                  styles.formatIcon,
-                  selectedFormat.liqu && styles.formatIconSelected,
-                ]}
-              />
-              <Text
-                style={[
-                  styles.formatText,
-                  selectedFormat.liqu && styles.formatTextSelected,
-                ]}
-              >
-                Liquide
-              </Text>
-            </Pressable>
-            <Pressable
-              style={[
-                styles.format,
-                selectedFormat.poud && styles.formatSelected,
-              ]}
-              onPress={() => toggleFormat("poud")}
-            >
-              <MaterialCommunityIcons
-                name="grain"
-                style={[
-                  styles.formatIcon,
-                  selectedFormat.poud && styles.formatIconSelected,
-                ]}
-              />
-              <Text
-                style={[
-                  styles.formatText,
-                  selectedFormat.poud && styles.formatTextSelected,
-                ]}
-              >
-                Poudre
-              </Text>
+            <View style={styles.formatContainer}>
+              <Text style={styles.formatTitle}>Format</Text>
+              <View style={styles.formatOptions}>
+                <Pressable
+                  style={[
+                    styles.format,
+                    selectedFormat.pill && styles.formatSelected,
+                  ]}
+                  onPress={() => toggleFormat("pill")}
+                >
+                  <MaterialCommunityIcons
+                    name="pill"
+                    style={[
+                      styles.formatIcon,
+                      selectedFormat.pill && styles.formatIconSelected,
+                    ]}
+                  />
+                  <Text
+                    style={[
+                      styles.formatText,
+                      selectedFormat.pill && styles.formatTextSelected,
+                    ]}
+                  >
+                    Pillule
+                  </Text>
+                </Pressable>
+                <Pressable
+                  style={[
+                    styles.format,
+                    selectedFormat.caps && styles.formatSelected,
+                  ]}
+                  onPress={() => toggleFormat("caps")}
+                >
+                  <AntDesign
+                    name="medicine-box"
+                    style={[
+                      styles.formatIcon,
+                      selectedFormat.caps && styles.formatIconSelected,
+                    ]}
+                  />
+
+                  <Text
+                    style={[
+                      styles.formatText,
+                      selectedFormat.caps && styles.formatTextSelected,
+                    ]}
+                  >
+                    Capsule
+                  </Text>
+                </Pressable>
+                <Pressable
+                  style={[
+                    styles.format,
+                    selectedFormat.liqu && styles.formatSelected,
+                  ]}
+                  onPress={() => toggleFormat("liqu")}
+                >
+                  <FontAwesome6
+                    name="droplet"
+                    style={[
+                      styles.formatIcon,
+                      selectedFormat.liqu && styles.formatIconSelected,
+                    ]}
+                  />
+                  <Text
+                    style={[
+                      styles.formatText,
+                      selectedFormat.liqu && styles.formatTextSelected,
+                    ]}
+                  >
+                    Liquide
+                  </Text>
+                </Pressable>
+                <Pressable
+                  style={[
+                    styles.format,
+                    selectedFormat.poud && styles.formatSelected,
+                  ]}
+                  onPress={() => toggleFormat("poud")}
+                >
+                  <MaterialCommunityIcons
+                    name="grain"
+                    style={[
+                      styles.formatIcon,
+                      selectedFormat.poud && styles.formatIconSelected,
+                    ]}
+                  />
+                  <Text
+                    style={[
+                      styles.formatText,
+                      selectedFormat.poud && styles.formatTextSelected,
+                    ]}
+                  >
+                    Poudre
+                  </Text>
+                </Pressable>
+              </View>
+            </View>
+            <View style={styles.frequenceContainer}>
+              <View style={styles.frequence}>
+                <Text style={styles.frequencetext}>Fréquence</Text>
+              </View>
+              <View style={styles.joursun}>
+                <Pressable
+                  style={[styles.jour, selectedDays.L && styles.jourSelected]}
+                  onPress={() => toggleDay("L")}
+                >
+                  <Text
+                    style={[
+                      styles.jourText,
+                      selectedDays.L && styles.jourTextSelected,
+                    ]}
+                  >
+                    L
+                  </Text>
+                </Pressable>
+                <Pressable
+                  style={[styles.jour, selectedDays.M1 && styles.jourSelected]}
+                  onPress={() => toggleDay("M1")}
+                >
+                  <Text
+                    style={[
+                      styles.jourText,
+                      selectedDays.M1 && styles.jourTextSelected,
+                    ]}
+                  >
+                    M
+                  </Text>
+                </Pressable>
+                <Pressable
+                  style={[styles.jour, selectedDays.M2 && styles.jourSelected]}
+                  onPress={() => toggleDay("M2")}
+                >
+                  <Text
+                    style={[
+                      styles.jourText,
+                      selectedDays.M2 && styles.jourTextSelected,
+                    ]}
+                  >
+                    M
+                  </Text>
+                </Pressable>
+                <Pressable
+                  style={[styles.jour, selectedDays.J && styles.jourSelected]}
+                  onPress={() => toggleDay("J")}
+                >
+                  <Text
+                    style={[
+                      styles.jourText,
+                      selectedDays.J && styles.jourTextSelected,
+                    ]}
+                  >
+                    J
+                  </Text>
+                </Pressable>
+                <Pressable
+                  style={[styles.jour, selectedDays.V && styles.jourSelected]}
+                  onPress={() => toggleDay("V")}
+                >
+                  <Text
+                    style={[
+                      styles.jourText,
+                      selectedDays.V && styles.jourTextSelected,
+                    ]}
+                  >
+                    V
+                  </Text>
+                </Pressable>
+              </View>
+              <View style={styles.joursdeux}>
+                <Pressable
+                  style={[styles.jour, selectedDays.S && styles.jourSelected]}
+                  onPress={() => toggleDay("S")}
+                >
+                  <Text
+                    style={[
+                      styles.jourText,
+                      selectedDays.S && styles.jourTextSelected,
+                    ]}
+                  >
+                    S
+                  </Text>
+                </Pressable>
+                <Pressable
+                  style={[styles.jour, selectedDays.D && styles.jourSelected]}
+                  onPress={() => toggleDay("D")}
+                >
+                  <Text
+                    style={[
+                      styles.jourText,
+                      selectedDays.D && styles.jourTextSelected,
+                    ]}
+                  >
+                    D
+                  </Text>
+                </Pressable>
+                <Pressable
+                  style={[
+                    styles.jour,
+                    styles.jourTous,
+                    selectedDays.Tous && styles.jourSelected,
+                  ]}
+                  onPress={() => toggleDay("Tous")}
+                >
+                  <Text
+                    style={[
+                      styles.jourText,
+                      selectedDays.Tous && styles.jourTextSelected,
+                    ]}
+                  >
+                    Tous
+                  </Text>
+                </Pressable>
+              </View>
+            </View>
+            <View style={styles.hourContainer}>
+              <Picker />
+            </View>
+          </ScrollView>
+          <View style={styles.ajoutContainer}>
+            <Pressable style={styles.creerContent} onPress="">
+              <Text style={styles.ajoutText}>Enregistrer le Rappel</Text>
             </Pressable>
           </View>
         </View>
-        <View style={styles.frequenceContainer}>
-          <View style={styles.frequence}>
-            <Text style={styles.frequencetext}>Fréquence</Text>
-          </View>
-          <View style={styles.joursun}>
-            <Pressable
-              style={[styles.jour, selectedDays.L && styles.jourSelected]}
-              onPress={() => toggleDay("L")}
-            >
-              <Text
-                style={[
-                  styles.jourText,
-                  selectedDays.L && styles.jourTextSelected,
-                ]}
-              >
-                L
-              </Text>
-            </Pressable>
-            <Pressable
-              style={[styles.jour, selectedDays.M1 && styles.jourSelected]}
-              onPress={() => toggleDay("M1")}
-            >
-              <Text
-                style={[
-                  styles.jourText,
-                  selectedDays.M1 && styles.jourTextSelected,
-                ]}
-              >
-                M
-              </Text>
-            </Pressable>
-            <Pressable
-              style={[styles.jour, selectedDays.M2 && styles.jourSelected]}
-              onPress={() => toggleDay("M2")}
-            >
-              <Text
-                style={[
-                  styles.jourText,
-                  selectedDays.M2 && styles.jourTextSelected,
-                ]}
-              >
-                M
-              </Text>
-            </Pressable>
-            <Pressable
-              style={[styles.jour, selectedDays.J && styles.jourSelected]}
-              onPress={() => toggleDay("J")}
-            >
-              <Text
-                style={[
-                  styles.jourText,
-                  selectedDays.J && styles.jourTextSelected,
-                ]}
-              >
-                J
-              </Text>
-            </Pressable>
-            <Pressable
-              style={[styles.jour, selectedDays.V && styles.jourSelected]}
-              onPress={() => toggleDay("V")}
-            >
-              <Text
-                style={[
-                  styles.jourText,
-                  selectedDays.V && styles.jourTextSelected,
-                ]}
-              >
-                V
-              </Text>
-            </Pressable>
-          </View>
-          <View style={styles.joursdeux}>
-            <Pressable
-              style={[styles.jour, selectedDays.S && styles.jourSelected]}
-              onPress={() => toggleDay("S")}
-            >
-              <Text
-                style={[
-                  styles.jourText,
-                  selectedDays.S && styles.jourTextSelected,
-                ]}
-              >
-                S
-              </Text>
-            </Pressable>
-            <Pressable
-              style={[styles.jour, selectedDays.D && styles.jourSelected]}
-              onPress={() => toggleDay("D")}
-            >
-              <Text
-                style={[
-                  styles.jourText,
-                  selectedDays.D && styles.jourTextSelected,
-                ]}
-              >
-                D
-              </Text>
-            </Pressable>
-            <Pressable
-              style={[
-                styles.jour,
-                styles.jourTous,
-                selectedDays.Tous && styles.jourSelected,
-              ]}
-              onPress={() => toggleDay("Tous")}
-            >
-              <Text
-                style={[
-                  styles.jourText,
-                  selectedDays.Tous && styles.jourTextSelected,
-                ]}
-              >
-                Tous
-              </Text>
-            </Pressable>
-          </View>
-        </View>
-        <View style={styles.ajoutContainer}>
-          <Pressable style={styles.creerContent} onPress="">
-            <Text style={styles.ajoutText}>Enregistrer le Rappel</Text>
-          </Pressable>
-        </View>
-      </View>
-    </Screen>
+      </Screen>
+    </>
   );
 }
 
@@ -447,11 +544,13 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "flex-start",
     padding: 5,
+    marginLeft: 15,
   },
   joursdeux: {
     flexDirection: "row",
     justifyContent: "flex-start",
     padding: 5,
+    marginLeft: 15,
   },
   jour: {
     backgroundColor: "white",
@@ -486,10 +585,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   frequenceContainer: {
-    paddingHorizontal: 20,
+    display: "flex",
+    paddingHorizontal: 0,
     paddingVertical: 10,
+    paddingBottom: 0,
     marginTop: 0,
-    // backgroundColor: "cyan",
     backgroundColor: "transparent",
   },
   frequence: {
@@ -497,6 +597,11 @@ const styles = StyleSheet.create({
   },
   frequencetext: {
     fontSize: 26,
+    fontWeight: 600,
+    fontFamily: "Montserrat",
+  },
+  hourContainer: {
+    marginBottom: 75,
   },
   ajoutContainer: {
     backgroundColor: colors.baogreen,

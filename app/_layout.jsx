@@ -6,7 +6,7 @@
 //   return <Slot />;
 // }
 
-import { Slot, Stack, useRouter, useSegments } from 'expo-router';
+import { Stack, useRouter, useSegments } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { supabase } from '../lib/supabase';
@@ -45,7 +45,7 @@ export default function RootLayout() {
       // Redirect to login if not signed in and not on auth page
       router.replace('/auth/login');
     }
-  }, [session, segments, loading]);
+  }, [session, segments, loading, router]);
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
@@ -55,9 +55,7 @@ export default function RootLayout() {
             headerShown: false,
             animation: 'slide_from_right',
           }}
-        >
-          <Slot />
-        </Stack>
+        />
       </RootineProvider>
     </GestureHandlerRootView>
   );

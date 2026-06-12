@@ -5,6 +5,7 @@ import { useRouter } from "expo-router";
 import { useState } from "react";
 import {
   Image,
+  KeyboardAvoidingView,
   Platform,
   Pressable,
   ScrollView,
@@ -27,9 +28,9 @@ const createMidnightDate = () => {
 
 export default function CreerRootine({ onChangeTime }) {
   const router = useRouter();
-  const { addRootine, rootine, setRootine, exercices } = useRootine();
+  const { addRootine, rootine, setRootine, exercices, updateExercice } =
+    useRootine();
   const [isModalVisible, setModalVisible] = useState(false);
-  const { serie, setSerie } = useRootine();
 
   const toggleModal = () => {
     setModalVisible(!isModalVisible);
@@ -226,41 +227,45 @@ export default function CreerRootine({ onChangeTime }) {
           </View>
         </Pressable>
       </Modal>
-      <View style={styles.container}>
-        <Pressable style={styles.icon} onPress={goBackToRootines}>
-          <Entypo name="chevron-left" size={24} color="black" />
-        </Pressable>
-        <View style={styles.titleContainer}>
-          <Text style={styles.title}>Créer une Rootine</Text>
-        </View>
-
-        <View style={[styles.ajoutContainer]}>
-          <Pressable
-            style={styles.creerContent}
-            onPress={() => {
-              handlesubmit();
-            }}
-          >
-            <Text style={styles.ajoutText}>Créer la Rootine</Text>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        style={styles.avoidingView}
+      >
+        <View style={styles.container}>
+          <Pressable style={styles.icon} onPress={goBackToRootines}>
+            <Entypo name="chevron-left" size={24} color="black" />
           </Pressable>
-        </View>
-        <ScrollView
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={{ paddingBottom: 130 }}
-        >
-          <View style={styles.card}>
-            <Text style={styles.label}>NOM DE LA SÉANCE</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Ex: Séance Jambes"
-              placeholderTextColor="#94A3B8"
-              value={rootine.nom}
-              onChangeText={(text) => {
-                setRootine({ ...rootine, nom: text });
-              }}
-            />
+          <View style={styles.titleContainer}>
+            <Text style={styles.title}>Créer une Rootine</Text>
+          </View>
 
-            {/* <Text style={[styles.label, { marginTop: 15 }]}>DURÉE ESTIMÉE</Text>
+          <View style={[styles.ajoutContainer]}>
+            <Pressable
+              style={styles.creerContent}
+              onPress={() => {
+                handlesubmit();
+              }}
+            >
+              <Text style={styles.ajoutText}>Créer la Rootine</Text>
+            </Pressable>
+          </View>
+          <ScrollView
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={{ paddingBottom: 130 }}
+          >
+            <View style={styles.card}>
+              <Text style={styles.label}>NOM DE LA SÉANCE</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="Ex: Séance Jambes"
+                placeholderTextColor="#94A3B8"
+                value={rootine.nom}
+                onChangeText={(text) => {
+                  setRootine({ ...rootine, nom: text });
+                }}
+              />
+
+              {/* <Text style={[styles.label, { marginTop: 15 }]}>DURÉE ESTIMÉE</Text>
             <Pressable
               style={styles.input}
               placeholder="Ex: 1h 00min"
@@ -280,186 +285,196 @@ export default function CreerRootine({ onChangeTime }) {
               </Text>
             </Pressable> */}
 
-            <StatusBar barStyle="dark-content" />
+              <StatusBar barStyle="dark-content" />
 
-            <View style={styles.inputContainer}>
-              <Text style={[styles.label, { marginTop: 15 }]}>
-                DURÉE ESTIMÉE
-              </Text>
-              <Pressable
-                style={styles.input}
-                placeholderTextColor="#94A3B8"
-                onPress={() => setShow(true)}
-              >
-                <Text style={styles.inputText}> {formatTime(date)} </Text>
-              </Pressable>
-
-              {/* LE PICKER NATIF */}
-              {show && (
-                <View
-                  style={
-                    Platform.OS === "ios"
-                      ? styles.iosPickerContainer
-                      : styles.androidPickerContainer
-                  }
+              <View style={styles.inputContainer}>
+                <Text style={[styles.label, { marginTop: 15 }]}>
+                  DURÉE ESTIMÉE
+                </Text>
+                <Pressable
+                  style={styles.input}
+                  placeholderTextColor="#94A3B8"
+                  onPress={() => setShow(true)}
                 >
-                  {Platform.OS === "ios" && (
-                    <TouchableOpacity
-                      style={styles.iosCloseButton}
-                      onPress={() => setShow(false)}
-                    >
-                      <Text style={styles.iosCloseButtonText}>OK</Text>
-                    </TouchableOpacity>
-                  )}
-                  <View style={styles.iosPickerTitleContainer}>
-                    <Text style={styles.iosPickerTitle}>
-                      Choisissez une durée
-                    </Text>
-                  </View>
+                  <Text style={styles.inputText}> {formatTime(date)} </Text>
+                </Pressable>
 
+                {/* LE PICKER NATIF */}
+                {show && (
                   <View
                     style={
-                      Platform.OS === "ios" ? styles.iosPickerWindow : null
+                      Platform.OS === "ios"
+                        ? styles.iosPickerContainer
+                        : styles.androidPickerContainer
                     }
                   >
-                    <DateTimePicker
-                      value={date}
-                      mode="time"
-                      is24Hour={true}
-                      display={Platform.OS === "ios" ? "spinner" : "default"}
-                      onChange={onChange}
-                      textColor="#1F2937" // iOS uniquement
-                      style={Platform.OS === "ios" ? styles.iosPicker : null}
-                    />
-                  </View>
-                </View>
-              )}
-            </View>
+                    {Platform.OS === "ios" && (
+                      <TouchableOpacity
+                        style={styles.iosCloseButton}
+                        onPress={() => setShow(false)}
+                      >
+                        <Text style={styles.iosCloseButtonText}>OK</Text>
+                      </TouchableOpacity>
+                    )}
+                    <View style={styles.iosPickerTitleContainer}>
+                      <Text style={styles.iosPickerTitle}>
+                        Choisissez une durée
+                      </Text>
+                    </View>
 
-            <Text style={[styles.label, { marginTop: 15 }]}>JOUR </Text>
-            <Pressable
-              style={styles.input}
-              placeholder="Ex: Lundi"
-              onPress={toggleModal}
-            >
-              <Text
-                style={[
-                  styles.inputText,
-                  { color: rootine.jour ? "#0F172A" : "#94A3B8" },
-                ]}
-              >
-                {rootine.jour || "Sélectionner un jour"}
-              </Text>
-            </Pressable>
-          </View>
-
-          <View>
-            <Text style={[styles.titleSection, { marginTop: 15 }]}>
-              Exercices ({exercices.length})
-            </Text>
-            <View style={[styles.card, { marginTop: 0 }]}>
-              {exercices == null || exercices.length === 0 ? (
-                <View>
-                  <Text
-                    style={{
-                      color: "#64748B",
-                      fontSize: 16,
-                      textAlign: "center",
-                      marginBottom: 10,
-                    }}
-                  >
-                    Aucun exercice ajouté pour le moment
-                  </Text>
-                  <View
-                    style={{
-                      backgroundColor: "#E2E8F0",
-                      width: "70%",
-                      height: 2,
-                      alignSelf: "center",
-                    }}
-                  />
-                </View>
-              ) : (
-                exercices.map((item, index) => (
-                  <View
-                    key={`${item.id}-${index}`}
-                    style={{
-                      backgroundColor: "#F1F5F9",
-                      borderRadius: 16,
-                      padding: 16,
-                      marginBottom: 10,
-                      alignItems: "center",
-                    }}
-                  >
-                    <Image
-                      style={styles.exerciceImage}
-                      source={{ uri: item.image }}
-                      resizeMode="contain"
-                    />
-                    <Text style={{ fontSize: 16, fontWeight: "bold" }}>
-                      {item.nom}
-                    </Text>
-                    <Text style={{ color: "#64748B", marginTop: 4 }}>
-                      {item.nbr_serie} séries x {item.nbr_rep} reps
-                    </Text>
-
-                    <View style={styles.inputContainerBigBoss}>
-                      <View style={styles.inputExoContainer}>
-                        <Text style={styles.inputExoText}>
-                          Séries :{item.nbr_serie}
-                        </Text>
-                        <TextInput
-                          // style={styles.inputExo}
-                          // placeholder="0"
-                          // placeholderTextColor="#94A3B8"
-                          value={item.nbr_serie}
-                          // onChangeText={(text) => {
-                          //   //setRootine({ ...serie, nbr_serie: text });
-                          // }}
-                        />
-                      </View>
-                      <View style={styles.inputExoContainer}>
-                        <Text style={styles.inputExoText}>Reps :</Text>
-                        <TextInput
-                          style={styles.inputExo}
-                          placeholder="0"
-                          placeholderTextColor="#94A3B8"
-                          defaultValue={item.nbr_rep}
-                          onChangeText={(text) => {
-                            //setRootine({ ...serie, nbr_rep: text });
-                          }}
-                        />
-                      </View>
-                      <View style={styles.inputExoContainer}>
-                        <Text style={styles.inputExoText}>Poids :</Text>
-                        <TextInput
-                          style={styles.inputExo}
-                          placeholder="0"
-                          placeholderTextColor="#94A3B8"
-                          value={item.poids}
-                          onChangeText={(text) => {
-                            //setSerie({ ...serie, poids: text });
-                          }}
-                        />
-                      </View>
+                    <View
+                      style={
+                        Platform.OS === "ios" ? styles.iosPickerWindow : null
+                      }
+                    >
+                      <DateTimePicker
+                        value={date}
+                        mode="time"
+                        is24Hour={true}
+                        display={Platform.OS === "ios" ? "spinner" : "default"}
+                        onChange={onChange}
+                        textColor="#1F2937" // iOS uniquement
+                        style={Platform.OS === "ios" ? styles.iosPicker : null}
+                      />
                     </View>
                   </View>
-                ))
-              )}
+                )}
+              </View>
 
-              <TouchableOpacity
-                style={styles.creer}
-                onPress={() => router.push("/rootine/add")}
+              <Text style={[styles.label, { marginTop: 15 }]}>JOUR </Text>
+              <Pressable
+                style={styles.input}
+                placeholder="Ex: Lundi"
+                onPress={toggleModal}
               >
-                <View style={styles.creerContent} type="submit">
-                  <FontAwesome5 name="plus" size={16} color={colors.baogreen} />
-                  <Text style={styles.creerText}>Ajouter un Exercice</Text>
-                </View>
-              </TouchableOpacity>
+                <Text
+                  style={[
+                    styles.inputText,
+                    { color: rootine.jour ? "#0F172A" : "#94A3B8" },
+                  ]}
+                >
+                  {rootine.jour || "Sélectionner un jour"}
+                </Text>
+              </Pressable>
             </View>
-          </View>
-        </ScrollView>
-      </View>
+
+            <View>
+              <Text style={[styles.titleSection, { marginTop: 15 }]}>
+                Exercices ({exercices.length})
+              </Text>
+              <View style={[styles.card, { marginTop: 0 }]}>
+                {exercices == null || exercices.length === 0 ? (
+                  <View>
+                    <Text
+                      style={{
+                        color: "#64748B",
+                        fontSize: 16,
+                        textAlign: "center",
+                        marginBottom: 10,
+                      }}
+                    >
+                      Aucun exercice ajouté pour le moment
+                    </Text>
+                    <View
+                      style={{
+                        backgroundColor: "#E2E8F0",
+                        width: "70%",
+                        height: 2,
+                        alignSelf: "center",
+                      }}
+                    />
+                  </View>
+                ) : (
+                  exercices.map((item, index) => (
+                    <View
+                      key={`${item.id}-${index}`}
+                      style={{
+                        backgroundColor: "#F1F5F9",
+                        borderRadius: 16,
+                        padding: 16,
+                        marginBottom: 10,
+                        alignItems: "center",
+                      }}
+                    >
+                      <Image
+                        style={styles.exerciceImage}
+                        source={{ uri: item.image }}
+                        resizeMode="contain"
+                      />
+                      <Text style={{ fontSize: 16, fontWeight: "bold" }}>
+                        {item.nom}
+                      </Text>
+                      <Text style={{ color: "#64748B", marginTop: 4 }}>
+                        {item.nbr_serie} séries x {item.nbr_rep} reps
+                      </Text>
+
+                      <View style={styles.inputContainerBigBoss}>
+                        <View style={styles.inputExoContainer}>
+                          <Text style={styles.inputExoText}>Séries :</Text>
+                          <TextInput
+                            key={`serie-${item.id}`}
+                            style={styles.inputExo}
+                            placeholder="0"
+                            placeholderTextColor="#94A3B8"
+                            value={item.nbr_serie?.toString() || ""}
+                            onChangeText={(text) => {
+                              updateExercice(item.id, {
+                                nbr_serie: text,
+                              });
+                            }}
+                          />
+                        </View>
+                        <View style={styles.inputExoContainer}>
+                          <Text style={styles.inputExoText}>Reps :</Text>
+                          <TextInput
+                            key={item.id}
+                            style={styles.inputExo}
+                            placeholder="0"
+                            placeholderTextColor="#94A3B8"
+                            value={item.nbr_rep?.toString() || ""}
+                            onChangeText={(text) => {
+                              updateExercice(item.id, {
+                                nbr_rep: text,
+                              });
+                            }}
+                          />
+                        </View>
+                        <View style={styles.inputExoContainer}>
+                          <Text style={styles.inputExoText}>Poids :</Text>
+                          <TextInput
+                            key={`${item.id}-poids`}
+                            style={styles.inputExo}
+                            placeholder="0"
+                            placeholderTextColor="#94A3B8"
+                            value={item.poids?.toString() || ""}
+                            onChangeText={(text) => {
+                              updateExercice(item.id, { poids: text });
+                            }}
+                          />
+                        </View>
+                      </View>
+                    </View>
+                  ))
+                )}
+
+                <TouchableOpacity
+                  style={styles.creer}
+                  onPress={() => router.push("/rootine/add")}
+                >
+                  <View style={styles.creerContent} type="submit">
+                    <FontAwesome5
+                      name="plus"
+                      size={16}
+                      color={colors.baogreen}
+                    />
+                    <Text style={styles.creerText}>Ajouter un Exercice</Text>
+                  </View>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </ScrollView>
+        </View>
+      </KeyboardAvoidingView>
     </>
   );
 }
@@ -739,5 +754,8 @@ const styles = StyleSheet.create({
     width: "100%",
     position: "relative",
     zIndex: 9999,
+  },
+  avoidingView: {
+    flex: 1,
   },
 });

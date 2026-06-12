@@ -198,6 +198,7 @@ export default function Rootine() {
     );
   }
 
+  console.log("RENDER -----");
   //   const { evenements } = useEvent();
 
   return (

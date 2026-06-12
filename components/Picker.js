@@ -44,9 +44,9 @@ export default function BeautifulNativePicker() {
           activeOpacity={0.7}
         >
           <Text style={styles.timeText}>{formatTime(date)}</Text>
-          <View style={styles.badge}>
+          {/* <View style={styles.badge}>
             <Text style={styles.badgeText}>Modifier</Text>
-          </View>
+          </View> */}
         </TouchableOpacity>
       </View>
 
@@ -92,27 +92,34 @@ const styles = StyleSheet.create({
     maxWidth: 340,
     alignItems: "center",
     // Ombres haut de gamme
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.05,
-    shadowRadius: 20,
-    elevation: 4,
+    // shadowColor: "#000",
+    // shadowOffset: { width: 0, height: 10 },
+    // shadowOpacity: 0.05,
+    // shadowRadius: 20,
+    // elevation: 4,
   },
   timeButton: {
-    backgroundColor: "#f9fcf8",
-    borderWidth: 2,
-    borderColor: colors.baogreen, // Bordure violet/bleu indigo
+    backgroundColor: "#ffffff",
+    // borderColor: colors.baogreen,
+    // borderRadius: 20,
     borderRadius: 20,
-    paddingVertical: 10,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+    borderColor: "#E2E8F0",
+    borderWidth: 1,
+    paddingVertical: 15,
     paddingHorizontal: 30,
     alignItems: "center",
     position: "relative",
-    width: "100%",
+    width: "85%",
   },
   timeText: {
-    fontSize: 48,
-    fontWeight: "800",
-    color: colors.baogreen, // Texte Indigo
+    fontSize: Platform.OS === "ios" ? 48 : 35,
+    fontWeight: Platform.OS === "ios" ? 400 : 600,
+    color: "#64748D",
     letterSpacing: 2,
   },
   badge: {
@@ -158,3 +165,12 @@ const styles = StyleSheet.create({
     right: 10,
   },
 });
+
+// ...Platform.select({
+//   ios: {
+//     fontSize: 48,
+//   },
+//   android: {
+//     fontSize: 35
+//   },
+// }),
